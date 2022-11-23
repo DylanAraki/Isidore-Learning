@@ -1,0 +1,20 @@
+<form *ngIf="!isConfirm">
+    <label for="Username"></label>
+    <input type="text" placeholder="Username" [(ngModel)]="user.username" name="username">
+    <label for="Email"></label>
+    <input type="email" placeholder="Email" [(ngModel)]="user.email" name="email">
+    <label for="Password"></label>
+    <input [type]="user.showPassword ? 'text' : 'password'" placeholder="Password" [(ngModel)]="user.password" name="password">
+
+    <div>
+        <input type="checkbox" [checked]="user.showPassword" (change)="user.showPassword = !user.showPassword">
+        Show password
+    </div>
+    <p>Already a member? <a [routerLink]="'/signin'">Sign in</a></p>
+    <button (click)="signUpWithCognito()">Sign up</button>
+</form>
+<form *ngIf="isConfirm">
+    <label for="Verification Code"></label>
+    <input type="text" placeholder="Code" [(ngModel)]="user.code" name="verificationCode">
+    <button (click)="confirmSignup()">Confirm signup</button>
+</form>

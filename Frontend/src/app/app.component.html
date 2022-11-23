@@ -1,0 +1,9 @@
+<header>
+    <nav>
+        <h1><a [routerLink]="''">Isidore Learning</a></h1>
+        <button [routerLink]="'signin'" *ngIf="currentUser === undefined">Sign in</button>
+        <button [routerLink]="'signup'" *ngIf="currentUser === undefined">Sign up</button>
+        <button [routerLink]="''" *ngIf="currentUser !== undefined" (click)="signOut()">Sign out</button>
+    </nav>
+</header>
+<router-outlet></router-outlet>
