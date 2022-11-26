@@ -13,6 +13,7 @@ SUBJECTS = {
 
 
 class Map(models.Model):
+    #TODO: Add default values rather than manually add them on creation
     owner = models.CharField(max_length=50)
     title = models.CharField(max_length=25)
     publicity = models.CharField(max_length=1, choices=PUBLICITY)

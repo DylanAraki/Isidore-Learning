@@ -9,11 +9,8 @@ from rest_framework import status
 
 #TODO: integrate w/ API Gateway
 
-
 @api_view(['POST'])
 def createMap(request): #Will also create a path and a landmark
-    print(type(request.data))
-
     request.data["title"] = "Untitled Map"
     request.data["publicity"] = "p"
 
@@ -29,6 +26,15 @@ def createMap(request): #Will also create a path and a landmark
             landmarkSerializer = LandmarkSerializer(data = {"pathId": pathSerializer.data["id"], "previousLandmark": None, "numAnimations": 1})
             if landmarkSerializer.is_valid():
                 landmarkSerializer.save()
-        return Response(mapSerializer.data, status=status.HTTP_201_CREATED)
+        #return Response(mapSerializer.data, status=status.HTTP_201_CREATED)
+        
+        #Return the response of all the unique IDs (default values will be assigned by client)
+        responseData = {"id": mapSerializer.data["id"], "owner": mapSerializer.data["owner"], "mainPath": pathSerializer.data["id"], "firstLandmark": landmarkSerializer.data["id"]}
+        return Response(responseData, status=status.HTTP_201_CREATED)
     else:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+def mainPath(request): #Gets the main path of a map with its landmarks and content
+    pass

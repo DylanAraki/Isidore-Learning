@@ -9,13 +9,13 @@ import { ContentService } from './content.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  currentUser: any;
+  currentUser: any; //TODO: Assign the type better
 
   constructor(private authenticator: AuthenticationService, private contentManager: ContentService, private router: Router) {
     //Determine which user (if any) is currently logged in
     authenticator.getCurrentUser()
     .then((user) => {
-      this.currentUser = user;
+      this.currentUser = user; //can be null
     });
   }
 
@@ -25,6 +25,20 @@ export class AppComponent {
       //Send a create request to the server
       this.contentManager.createMap("dummy") //TODO: Get real string
       .subscribe((data) => {
+        //Save the map in the service
+        this.contentManager.addMapToDictionary(data);
+        //Save the main path in the service
+        const pathResponse = {
+          "id": data["mainPath"], 
+          "mapId": data["id"], 
+          "landmarks": [
+            {
+              "id": data["firstLandmark"],
+              "previousLandmark": null
+            }
+          ]
+        }
+        this.contentManager.addPathToDictionary(pathResponse);
         //Redirect route to edit 
         this.router.navigate(['edit/' + data["id"]]); 
       });

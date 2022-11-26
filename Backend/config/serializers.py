@@ -6,6 +6,7 @@ class MapSerializer(serializers.ModelSerializer):
         model = Map
         #fields = ['id', 'owner', 'title', 'publicity', 'description', 'topic']
         fields = ['id', 'owner', 'title', 'publicity']
+        #TODO: Depth?
 
 class PathSerializer(serializers.ModelSerializer):
     class Meta:
