@@ -1,9 +1,22 @@
 <header>
-    <nav>
-        <h1><a [routerLink]="''">Isidore Learning</a></h1>
-        <button [routerLink]="'signin'" *ngIf="currentUser === undefined">Sign in</button>
-        <button [routerLink]="'signup'" *ngIf="currentUser === undefined">Sign up</button>
-        <button [routerLink]="''" *ngIf="currentUser !== undefined" (click)="signOut()">Sign out</button>
-    </nav>
+  <nav>
+    <h1><a [routerLink]="''">Isidore Learning</a></h1>
+    <button (click)="createMap()">Create Learning Map</button>
+    <button [routerLink]="'sign-in'" *ngIf="currentUser===null">Sign in</button>
+    <button [routerLink]="'register'" *ngIf="currentUser===null">Register</button>
+    <button *ngIf="currentUser!==null">Sign out</button>
+  </nav>
 </header>
 <router-outlet></router-outlet>
+
+
+<!--
+  Tomorrow, just get all the data flows working. Use Cognito and Gateway to work on requests.
+
+  Restart it now make a proper login/signup page myself, using the API. Commit once this is taken care of.
+  After that, continue down the list of milestones, one-by-one (note that step 2 should primarily be concerned with integrating Django to work with the database
+  and thinking about how Django would work with Gateway while probably testing a direct Angular to Django connection).
+  Then, probably will just go back and forth between Angular-Django-PostgreSQL data flows as I go down the list
+
+
+-->
