@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Map, Path } from './content'
+import { ImageBox, Map, Path } from './content'
 
 @Injectable({
   providedIn: 'root'
@@ -13,20 +13,32 @@ export class ContentService {
   private url = "http://localhost:8000/"; //TODO: Temporary (move to environments)
   constructor(private http: HttpClient) { }
 
-  public createMap(userId: string): Observable<any> {
-    return this.http.post(this.url+'create-map/', {
-      "owner": userId
-    })
-  }
 
+
+  //CREATING LOCAL TYPESCRIPT OBJECTS
   public addMapToDictionary(mapResponse: {[id: string]: string}): void {
     this.maps[mapResponse['id']] = new Map(mapResponse);
   }
   public addPathToDictionary(pathResponse: {[id: string]: any}): void {
     this.paths[pathResponse['id']] = new Path(pathResponse);
+  }  
+  //HTTP POST REQUESTS
+  public createMap(userId: string): Observable<any> {
+    return this.http.post(this.url + 'create-map/', {
+      "owner": userId
+    })
   }
-
-
+  public createImageBox(imageFile: File, imageInfo: ImageBox): Observable<any> {
+    const uploadData = new FormData();
+    uploadData.append("landmarkId", imageInfo.landmarkId.toString());
+    uploadData.append("x", imageInfo.x.toString());
+    uploadData.append("y", imageInfo.y.toString());
+    uploadData.append("width", imageInfo.width.toString());
+    uploadData.append("height", imageInfo.height.toString());
+    uploadData.append("image", imageFile);
+    return this.http.post(this.url + 'create-image/', uploadData);
+  }
+  //HTTP OR LOCAL GET REQUESTS
   public getMap(id: string): Observable<any> {
     if(id in this.maps) {
       return new Observable((subscriber) => {

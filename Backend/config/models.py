@@ -30,3 +30,10 @@ class Landmark(models.Model):
     pathId = models.ForeignKey(Path, on_delete=models.CASCADE)
     previousLandmark = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     numAnimations = models.SmallIntegerField()
+
+class ImageBox(models.Model):
+    landmarkId: models.ForeignKey(Landmark, on_delete=models.CASCADE)
+    x = models.IntegerField()
+    y = models.IntegerField()
+    width = models.IntegerField()
+    height = models.IntegerField()

@@ -1,0 +1,10 @@
+@import "../../../node_modules/subjx/dist/style/subjx.css";
+.svg-wrapper {
+    background-color: #e6e6e6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+svg {
+    background-color: white;
+}

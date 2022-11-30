@@ -1,0 +1,11 @@
+<div class="svg-wrapper" [ngStyle]="{'width': w.toString()+'px', 'height': h.toString()+'px'}">
+    <svg viewBox="0, 0, 1536, 864" [ngStyle]="w/h > 16/9 ? {height: h, width: 16/9*h} : {height: 9/16*w, width: w}" (click)="clickSvg($event)">
+        <g *ngFor="let contentBox of currentLandmark.getContent() | keyvalue" class="content" [id]="contentBox.key"  [attr.transform]="contentBox.value.transformation">
+            <image *ngIf="contentBox.key[0]==='i'" class="image-content" [attr.href]="contentBox.value.content[0]" [attr.width]="contentBox.value.width.toString()" [attr.height]="contentBox.value.height.toString()" [attr.x]="contentBox.value.x.toString()" [attr.y]="contentBox.value.y.toString()"></image>
+        </g>
+        
+        <!--
+        <image [id]="img.cssId" class="image-class" *ngFor="let img of currentLandmark.getImageContent()" [attr.href]="img.src" [attr.width]="img.width.toString()" [attr.height]="img.height.toString()"  [attr.x]="img.x.toString()" [attr.y]="img.y.toString()"></image>
+        -->
+    </svg>
+</div>
