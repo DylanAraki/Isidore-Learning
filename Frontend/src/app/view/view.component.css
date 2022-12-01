@@ -1,10 +1,18 @@
 @import "../../../node_modules/subjx/dist/style/subjx.css";
+
 .svg-wrapper {
     background-color: #e6e6e6;
+    padding: 5%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 svg {
     background-color: white;
+}
+.text-wrapper {
+    min-height: 50px;
+}
+foreignObject {
+    overflow: visible;
 }

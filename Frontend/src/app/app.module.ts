@@ -10,6 +10,10 @@ import { SignInComponent } from './sign-in/sign-in.component';
 import { RegisterComponent } from './register/register.component';
 import { EditComponent } from './edit/edit.component';
 import { ViewComponent } from './view/view.component';
+import { PathAttributePipe } from './path-attribute.pipe';
+import { LineOptionsComponent } from './line-options/line-options.component';
+import { LegendComponent } from './legend/legend.component';
+import { VerticalTrailComponent } from './vertical-trail/vertical-trail.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +22,11 @@ import { ViewComponent } from './view/view.component';
     SignInComponent,
     RegisterComponent,
     EditComponent,
-    ViewComponent
+    ViewComponent,
+    PathAttributePipe,
+    LineOptionsComponent,
+    LegendComponent,
+    VerticalTrailComponent
   ],
   imports: [
     BrowserModule,

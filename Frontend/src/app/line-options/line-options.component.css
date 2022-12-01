@@ -1,0 +1,12 @@
+/*
+These numbers are temporary and messy
+*/
+.pop-up-wrapper {
+    height: 400px;
+    width: 400px;
+    top: -50px;
+    left: 35vw;
+    background-color: red;
+    position: relative;
+    z-index: 2;
+}

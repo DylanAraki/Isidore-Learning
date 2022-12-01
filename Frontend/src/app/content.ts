@@ -104,8 +104,11 @@ export class Landmark {
     }
 }
 
+
+//TODO: These implementations are a mess. 
 export interface ContentBox {
     readonly id: number;
+    readonly landmarkId: number;
     x: number;
     y: number;
     width: number;
@@ -116,7 +119,8 @@ export interface ContentBox {
     content: any[];
 
     move(newX: number, newY: number): void;
-    resize(newWidth: number, newHeight: number): void
+    resize(newWidth: number, newHeight: number): void;
+    setTransformation(newTransformation: SVGMatrix): void;
 }
 
 export class ImageBox implements ContentBox {
@@ -157,5 +161,87 @@ export class ImageBox implements ContentBox {
     }
     public setTransformation(newTransformation: SVGMatrix) {
         this.transformation = new DOMMatrix([newTransformation.a, newTransformation.b, newTransformation.c, newTransformation.d, newTransformation.e, newTransformation.f]);
+    }
+}
+
+export class ShapeBox implements ContentBox {
+    id: number;
+    landmarkId: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    transformation: DOMMatrix;
+    saved: boolean;
+    cssId: string;
+    content: any[] = [];
+    constructor(shapeResponse: {[id: string]: any}, saved: boolean) {
+        this.id = +shapeResponse['id'];
+        this.landmarkId = +shapeResponse['landmarkId'];
+        this.x = +shapeResponse['x'];
+        this.y = +shapeResponse['y'];
+        this.width = +shapeResponse['width'];
+        this.height = +shapeResponse['height'];
+
+        this.transformation = new DOMMatrix([1,0,0,1,0,0]);
+
+        this.saved = saved;
+        this.cssId = "shape" + shapeResponse['id'];
+        this.content.push(shapeResponse['content']);
+
+    }
+    public move(newX: number, newY: number) {
+        this.x = newX;
+        this.y = newY;
+    }
+    public resize(newWidth: number, newHeight: number) {
+        this.width = newWidth;
+        this.height = newHeight;
+    }
+    public setTransformation(newTransformation: SVGMatrix) {
+        this.transformation = new DOMMatrix([newTransformation.a, newTransformation.b, newTransformation.c, newTransformation.d, newTransformation.e, newTransformation.f]);
+    }   
+}
+export class TextBox implements ContentBox {
+    id: number;
+    landmarkId: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    transformation: DOMMatrix;
+    saved: boolean;
+    cssId: string;
+    content: any[] = [];
+    constructor(textResponse: {[id: string]: any}, saved: boolean) {
+        this.id = +textResponse['id'];
+        this.landmarkId = +textResponse['landmarkId'];
+        this.x = +textResponse['x'];
+        this.y = +textResponse['y'];
+        this.width = +textResponse['width'];
+        this.height = +textResponse['height'];
+        this.content = textResponse['content'];
+        this.cssId = "txt" + textResponse['id'];
+        this.saved = saved;
+
+        this.transformation = new DOMMatrix([1,0,0,1,0,0]);
+    }
+
+    public move(newX: number, newY: number) {
+        this.x = newX;
+        this.y = newY;
+    }
+    public resize(newWidth: number, newHeight: number) {
+        this.width = newWidth;
+        this.height = newHeight;
+    }
+    public setTransformation(newTransformation: SVGMatrix) {
+        this.transformation = new DOMMatrix([newTransformation.a, newTransformation.b, newTransformation.c, newTransformation.d, newTransformation.e, newTransformation.f]);
+    } 
+    public getTextSpans(): string[] {
+        return this.content;
+    }
+    public getHeight(): number {
+        return this.height;
     }
 }

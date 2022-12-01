@@ -1,0 +1,27 @@
+.top {
+    height: 100px;
+}
+.bot {
+    height: calc(100vh - 150px); /*50 px for the header and 100 px for the top bar. TODO: Substitute variables*/
+    top: 150px;
+    display: flex;
+    width: 100vw;
+    flex-direction: row;
+    position: absolute;
+}
+.vertical-nav {
+    width: 100px;
+    height: 100%;
+}
+.legend {
+    width: 100px;
+    height: 100%;
+    
+}
+/*.svg-wrapper {
+    background-color: #e6e6e6;
+    padding: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}*/
