@@ -1,3 +1,91 @@
+//TODO: When back, restructure the classes with aim of pushing data into the template and saving it to the database.
+export class Map {
+    private id: number;
+    private owner: string;
+    private title: string = "Untitled Learning Map";
+    private publicity: string = 'p';
+    private tags: string[] | null = null;
+    private description: string | null = null;
+    private topic: string | null = null;
+    private lastSaved: Date;
+
+    constructor(mapResponse: {[key: string]: any}) { 
+        this.id = mapResponse['id'];
+        this.owner = mapResponse['owner'];
+        if("title" in mapResponse) {
+            this.title = mapResponse['title'];
+        }
+        if("publicity" in mapResponse) {
+            this.publicity = mapResponse['publicity'];
+        }
+        if("tags" in mapResponse) {
+            this.tags = mapResponse['tags'];
+        }
+        if("description" in mapResponse) {
+            this.description = mapResponse['description'];
+        }
+        if("topic" in mapResponse) {
+            this.topic = mapResponse['topic'];
+        }
+        this.lastSaved = new Date(mapResponse['lastSaved']);
+    }
+}
+export class Path {
+    private id: number;
+    private mapId: number;
+    private isMainPath: boolean;
+    private landmarks: Landmark[] = [];
+
+    constructor(pathResponse: {[key:string ]: any}) {
+        this.id = pathResponse['id'];
+        this.mapId = pathResponse['mapId'];
+        this.isMainPath = pathResponse['isMainPath'];
+        for(let landmarkResponse of pathResponse['landmarks']) {
+            //TODO: TEMP!!!!
+            this.landmarks.push(new Landmark(landmarkResponse));
+        }
+    }
+    public getId() {
+        return this.id;
+    }
+    public getFirstLandmark() {
+        return this.landmarks[0];
+    }
+}
+export class Landmark {
+    private id: number;
+    private numAnimations: number = 1;
+    private nextLandmark: Landmark | null = null;
+    //private legend
+    private textContent: {[key:string]: TextBox} = {};
+    private shapeContent: {[key:string]: ShapeBox} = {};
+    private imageContent: {[key:string]: ImageBox} = {};
+
+    constructor(landmarkResponse: {[key:string]: any}) {
+        this.id = landmarkResponse['id'];
+        if('nextLandmark' in landmarkResponse) {
+            this.nextLandmark = landmarkResponse['id'];
+        }
+    }
+}
+export class TextBox {
+
+}
+export class ShapeBox {
+
+}
+export class ImageBox {
+
+}
+
+
+
+
+
+
+
+
+/*
 export class Map {
     private id: number;
     private owner: string;
@@ -96,6 +184,7 @@ export class Landmark {
     public addImageContent(box: ImageBox) {
         this.imageContent.push(box);
     }*/
+    /*
     public getContent() {
         return this.content;
     }
@@ -245,3 +334,4 @@ export class TextBox implements ContentBox {
         return this.height;
     }
 }
+*/

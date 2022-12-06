@@ -22,17 +22,18 @@ export class ViewComponent implements OnInit {
   private svgPosition: [number, number] = [0, 0];
   private contentCount!: number;
   protected draggable: any = null; //TODO: Typecast properly
-  protected tempTextBox: TextBox;
+  //protected tempTextBox: TextBox;
   protected textObserver: ResizeObserver;;
 
   constructor(private contentManager: ContentService, private ref: ChangeDetectorRef) {
-    this.tempTextBox = new TextBox({ 'id': 0, 'landmarkId': 0, 'x': 0, 'y': 0, 'width': 50, 'height': 20, 'content': Array.of('') }, false); //TODO: This is just a hack...
+    
+    //this.tempTextBox = new TextBox({ 'id': 0, 'landmarkId': 0, 'x': 0, 'y': 0, 'width': 50, 'height': 20, 'content': Array.of('') }, false); //TODO: This is just a hack...
 
     this.textObserver = new ResizeObserver(entries => {
       if (entries[0].contentRect) {
-        console.log(this.tempTextBox.height);
-        this.tempTextBox.height = this.tempTextBox.height < entries[0].contentRect.height ? entries[0].contentRect.height : this.tempTextBox.height;
-        console.log(this.tempTextBox.height);
+        //console.log(this.tempTextBox.height);
+        //this.tempTextBox.height = this.tempTextBox.height < entries[0].contentRect.height ? entries[0].contentRect.height : this.tempTextBox.height;
+        //console.log(this.tempTextBox.height);
         //this.ref.markForCheck();
 
       }
@@ -42,11 +43,11 @@ export class ViewComponent implements OnInit {
   ngOnInit(): void {
     this.svgDom = document.getElementsByTagName("svg")[0];
     this.svgPoint = this.svgDom.createSVGPoint();
-    this.contentCount = Object.keys(this.currentLandmark.getContent()).length; //TODO: Need a better way of mapping unsaved data
+    //this.contentCount = Object.keys(this.currentLandmark.getContent()).length; //TODO: Need a better way of mapping unsaved data
 
 
   }
-
+  /*
   public addImage(event: any) {
     //Get the uploaded file
     const imgFile = event.target.files[0];
@@ -218,11 +219,12 @@ export class ViewComponent implements OnInit {
   private resetDraggable() {
     this.draggable.disable();
     this.draggable = null;
-    /*const disabling = new Promise((resolve) => {
+    const disabling = new Promise((resolve) => {
       resolve(this.draggable.disable());
     })
     disabling.then(() => {
       this.draggable = null;
-    })*/
+    })
   }
+  */
 }

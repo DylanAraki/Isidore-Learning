@@ -31,6 +31,7 @@ export class AppComponent {
         const pathResponse = {
           "id": data["mainPath"], 
           "mapId": data["id"], 
+          "isMainPath": true,
           "landmarks": [
             {
               "id": data["firstLandmark"],
@@ -38,7 +39,7 @@ export class AppComponent {
             }
           ]
         }
-        this.contentManager.addPathToDictionary(pathResponse);
+        this.contentManager.addMainPathToDictionary(pathResponse);
         //Redirect route to edit 
         this.router.navigate(['edit/' + data["id"]]); 
       });

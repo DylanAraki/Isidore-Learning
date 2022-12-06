@@ -3,24 +3,31 @@ import { ActivatedRoute } from '@angular/router';
 import { ContentDisplay } from '../content-display';
 import { ContentService } from '../content.service';
 import { LineOptionsComponent } from '../line-options/line-options.component';
+import { Map, Path, Landmark } from '../content';
 
 @Component({
   selector: 'app-edit',
   templateUrl: './edit.component.html',
   styleUrls: ['./edit.component.css']
 })
-export class EditComponent extends ContentDisplay implements OnInit {
+export class EditComponent implements OnInit {
   @ViewChild('editOptions', {read: ViewContainerRef})
   editOptions!: ViewContainerRef
+  
 
   height!: number
   width!: number
   //@ViewChild(selector: 'edit-options', opts:{read: ViewContainerRef}, container: ViewContainerRef)
-  
+  currentPath!: Path
+  currentLandmark!: Landmark
+
+
+
+  currentMap!: Map
+  state: [Path, Landmark][] = [];
 
 
   constructor(private contentManager: ContentService, private route: ActivatedRoute) { 
-    super();
     this.getScreenSize();
   }
 
@@ -35,19 +42,35 @@ export class EditComponent extends ContentDisplay implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if(id !== null) {
-      this.contentManager.getMap(id)
-      .subscribe((map) => {
+      let map = this.contentManager.checkMap(+id);
+      if(map !== null) {
         this.currentMap = map;
         console.log(this.currentMap);
-      });
-      
-      this.contentManager.getMainPath(id)
-      .subscribe((path) => {
-        this.currentPath = path;
-        console.log(this.currentPath);
-        this.currentLandmark = path.getFirstLandmark();
-        console.log(this.currentLandmark);
-      })
+      }
+      else {
+        this.contentManager.getMap(+id)
+        .subscribe((mapResponse) => {
+          this.contentManager.addMapToDictionary(mapResponse);
+          map = this.contentManager.checkMap(+id)!;
+          this.currentMap = map;
+          console.log(this.currentMap);
+        })
+      }
+
+      let path = this.contentManager.checkMainPath(+id);
+      if(path !== null) {
+        this.state.push([path, path.getFirstLandmark()]);
+        console.log(this.state);
+      }
+      else {
+        this.contentManager.getMainPath(+id)
+        .subscribe((pathResponse) => {
+          this.contentManager.addMainPathToDictionary(pathResponse);
+          path = this.contentManager.checkMainPath(+id)!;
+          this.state.push([path, path.getFirstLandmark()]);
+          console.log(this.state)
+        })
+      }
     }
     else {
       //TODO: redirect

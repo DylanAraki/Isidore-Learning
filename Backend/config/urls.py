@@ -20,6 +20,8 @@ from config import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('create-map/', views.createMap),
-    path('main-path/', views.mainPath),
+    path('map/<int:id>/', views.getMap),
+    path('main-path/<int:id>/', views.getMainPath),
+    path('path/<int:id>/', views.getPath),
     path('create-image/', views.createImage)
 ]

@@ -14,6 +14,7 @@ import { PathAttributePipe } from './path-attribute.pipe';
 import { LineOptionsComponent } from './line-options/line-options.component';
 import { LegendComponent } from './legend/legend.component';
 import { VerticalTrailComponent } from './vertical-trail/vertical-trail.component';
+import { HorizontalTrailComponent } from './horizontal-trail/horizontal-trail.component';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { VerticalTrailComponent } from './vertical-trail/vertical-trail.componen
     PathAttributePipe,
     LineOptionsComponent,
     LegendComponent,
-    VerticalTrailComponent
+    VerticalTrailComponent,
+    HorizontalTrailComponent
   ],
   imports: [
     BrowserModule,
