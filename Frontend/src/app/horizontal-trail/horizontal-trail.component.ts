@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Path } from '../content';
 
 @Component({
   selector: 'app-horizontal-trail',
@@ -7,9 +8,15 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HorizontalTrailComponent implements OnInit {
 
+  @Input() currentPath!: Path;
+
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  protected addLandmark(start: boolean) {
+    console.log(start);
   }
 
 }

@@ -6,6 +6,20 @@ fa-icon {
     display: grid;
     grid-template-rows: 100px calc(100vh - 150px); /*Rather uneasy about this*/
 }
+.top {
+    display: flex;
+}
+/* app-horizontal-trail {
+    width: 60%; 
+    height: 100%;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border: solid;
+} */
+
+app-horizontal-trail {
+    width: 60%;
+}
 .bot {
     background-color: #e6e6e6;
     display: flex;

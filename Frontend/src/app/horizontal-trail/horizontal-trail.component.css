@@ -1,0 +1,28 @@
+#horizontal-trail-wrap {
+    width: 100%; 
+    height: calc(100% - 4px);
+    overflow-x: scroll;
+    overflow-y: hidden;
+    border: 2px solid;
+
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+.landmark-entry {
+    height: 100%;
+    display: flex;
+    gap: 5px;
+    margin-top: 7px;
+    margin-bottom: 3px;
+}
+.landmark-image {
+    width: 128px;
+    height: 72px;
+    border: 2px solid;
+} 
+.add-landmark-btn {
+    height: 50px;
+    width: 50px;
+    margin: 5px;
+}

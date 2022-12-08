@@ -1,7 +1,7 @@
 @import "../../../node_modules/subjx/dist/style/subjx.css";
 
 
-#landmark-display {
+.landmark-display {
     background-color: white;
     aspect-ratio: 16/9;
     max-width: 100%;

@@ -1,5 +1,5 @@
-<svg id="landmark-display" viewBox="0, 0, 1920, 1080" (click)="clickLandmark($event)">
-    <image *ngFor="let imageBox of currentLandmark.imageContent | keyvalue" class="image-content" [id]="imageBox.key" [attr.href]="imageBox.value.image"
+<svg class="landmark-display" [id]="editMode ? 'editable-landmark' : ''" viewBox="0, 0, 1920, 1080" (click)="clickLandmark($event)">
+    <image *ngFor="let imageBox of currentLandmark.imageContent | keyvalue" class="image-content" [id]="editMode ? imageBox.key : ''" [attr.href]="imageBox.value.image"
     [attr.x]="imageBox.value.x" [attr.y]="imageBox.value.y" [attr.width]="imageBox.value.width" [attr.height]="imageBox.value.height" [attr.transform]="imageBox.value.transformation">
     </image>
 </svg>

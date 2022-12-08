@@ -1,7 +1,7 @@
 <div *ngIf="state !== undefined && currentMap !== undefined" class="edit-wrap">
     <div class="top">
         <h1>{{currentMap.getTitle()}}</h1>
-
+        <app-horizontal-trail [currentPath]="state[state.length-1][0]"></app-horizontal-trail>
         <fa-icon [icon]="faImage" (click)="selectedIcon === ICON_SELECTED.IMAGE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.IMAGE"></fa-icon>
         <input *ngIf="selectedIcon === ICON_SELECTED.IMAGE" type="file" (change)="view.addImage($event); selectedIcon = ICON_SELECTED.NONE;">
         <!--
