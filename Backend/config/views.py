@@ -3,7 +3,7 @@ import json
 from django import forms
 from django.http import JsonResponse
 from .models import ImageBox, Map, Path, Landmark
-from .serializers import ImageBoxSerializer, MapSerializer, PathSerializer, LandmarkSerializer
+from .serializers import ImageBoxSerializer, ImageUpdateSerializer, MapSerializer, PathSerializer, LandmarkSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -81,39 +81,12 @@ def getMainPath(request, id):
     return Response(pathSerializer.data, status=status.HTTP_200_OK)
 
 
-""" @api_view(['PUT'])
-def save(request):
-    #print(request.data['creations'])
-    #Deletions
-
-
-    #Creations
-    for id, value in request.data['creations'].items():
-        if id[0] == 'i': #Image
-            serializer = ImageBoxSerializer(data={'landmarkId': value['landmarkId'], 'x': round(value['x']), 'y': round(value['y']), 'width': round(value['width']), 'height': round(value['height'])})
-            if serializer.is_valid:
-                #Save the image
-                file = request.FILES.get('src')
-                print(file) #As images involve file uploads, perhaps they should be handled separately...
-                    
-
-
-                #serializer.save()
-            else:
-                print("ANGRY COSTUME")
-
-            
-    
-
-    #Updates
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR) """
-
-
-
 @api_view(['POST'])
 def createImage(request):
     imageFile = request.FILES.get('image')
-    imageFile.name = str(uuid.uuid4())
+    #TODO: Add file type verification
+
+    imageFile.name = str(uuid.uuid4()) #Virtually zero chance of a collision
     
     serializer = ImageBoxSerializer(data={'landmarkId': int(request.POST.get('landmarkId')), 'x': int(request.POST.get('x')), 'y': int(request.POST.get('y')), 'width': int(request.POST.get('width')), 'height': int(request.POST.get('height')), 'image': imageFile})
     if serializer.is_valid():
@@ -121,3 +94,8 @@ def createImage(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+@api_view(['PUT'])
+def updateImage(request, id):
+    #TODO: Add error checking
+    ImageBox.objects.filter(id = id).update(x = request.data['x'], y = request.data['y'], width = request.data['width'], height = request.data['height'], transformation = request.data['transformation'])
+    return Response(status=status.HTTP_200_OK)

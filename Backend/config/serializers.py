@@ -2,16 +2,10 @@ from rest_framework import serializers
 from .models import Map, Path, Landmark, ImageBox
 
 
-"""
-class ImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ImageBox
-        fields = ['id', 'landmarkId', 'x', 'y', 'width', 'height']
-"""
 class ImageBoxSerializer(serializers.ModelSerializer):
     class Meta:
         model = ImageBox
-        fields = ['id', 'landmarkId', 'x', 'y', 'width', 'height', 'image']
+        fields = ['id', 'landmarkId', 'x', 'y', 'width', 'height', 'transformation', 'image']
 class LandmarkSerializer(serializers.ModelSerializer):
     images = ImageBoxSerializer(many=True, read_only=True)
     class Meta:
@@ -29,3 +23,9 @@ class MapSerializer(serializers.ModelSerializer):
         #fields = ['id', 'owner', 'title', 'publicity', 'description', 'topic']
         fields = ['id', 'owner', 'lastSaved']
         #TODO: Depth?
+
+
+class ImageUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageBox
+        fields = ['id', 'x', 'y', 'width', 'height']

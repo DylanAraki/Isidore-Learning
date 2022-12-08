@@ -24,5 +24,6 @@ urlpatterns = [
     path('main-path/<int:id>/', views.getMainPath),
     path('path/<int:id>/', views.getPath),
     path('create-image/', views.createImage),
+    path('image-boxes/<int:id>/', views.updateImage)
     #path('save/', views.save)
 ]

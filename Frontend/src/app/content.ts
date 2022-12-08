@@ -66,7 +66,9 @@ export class Landmark {
     //private textContent: {[key:string]: TextBox} = {};
     //private shapeContent: {[key:string]: ShapeBox} = {};
     //public imageContent: {[key:string]: ImageBox} = {};
-    public imageContent: ImageBox[] = [];
+    
+    //public imageContent: ImageBox[] = [];
+    public imageContent: {[id: string]: ImageBox} = {};
 
     constructor(landmarkResponse: {[key:string]: any}) {
         this.id = landmarkResponse['id'];
@@ -74,7 +76,8 @@ export class Landmark {
             this.nextLandmark = landmarkResponse['nextLandmark'];
         }
         for(let imageResponse of landmarkResponse['images']) {
-            this.imageContent.push(new ImageBox(imageResponse));
+            //this.imageContent.push(new ImageBox(imageResponse));
+            this.imageContent['i' + imageResponse['id']] = new ImageBox(imageResponse);
         }
     }
     public getId(): number { return this.id; }
@@ -112,6 +115,24 @@ export class ImageBox {
     }
 
     public getId(): string { return this.id; }
+
+    public updateContent(element: any) {
+        this.x = +element.getAttribute('x');
+        this.y = +element.getAttribute('y');
+        this.width = +element.getAttribute('width');
+        this.height = +element.getAttribute('height');
+        this.transformation = new DOMMatrix(element.getAttribute('transform'));
+    }
+
+    public formatHttp() {
+        return {
+            'x': this.x,
+            'y': this.y,
+            'width': this.width,
+            'height': this.height,
+            'transformation': [this.transformation.a, this.transformation.b, this.transformation.c, this.transformation.d, this.transformation.e, this.transformation.f]
+        };
+    }
 }
 export class TextBox {
 

@@ -11,6 +11,8 @@ SUBJECTS = {
     ('PHY', 'Physics'),
     ('CSC', 'Computer Science')
 }
+def defaultTransformation():
+    return [1, 0, 0, 1, 0, 0]
 
 #TODO: Add default values rather than manually add them on creation
 class Map(models.Model):
@@ -39,7 +41,7 @@ class ImageBox(models.Model):
     width = models.IntegerField()
     height = models.IntegerField()
     image = models.FileField(upload_to='image-boxes/', unique=True) 
-    #TODO: transformation is an array of size 6 of integers
+    transformation = ArrayField(models.FloatField(), size=6, default=defaultTransformation)
     animationAppearance = models.SmallIntegerField(default=0)
 
  

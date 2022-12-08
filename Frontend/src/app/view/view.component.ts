@@ -28,6 +28,8 @@ export class ViewComponent implements OnInit {
   @Input() currentLandmark!: Landmark;
   private landmarkDom: any; //Typecast better
   private landmarkPosition: any;
+  private newId: string | null = null;
+  protected draggable: any = null;
 
   constructor(private contentManager: ContentService) {}
   ngOnInit(): void {
@@ -37,8 +39,20 @@ export class ViewComponent implements OnInit {
     //Maintain a reference to the landmark display's DOM element
     this.landmarkDom = document.getElementById("landmark-display")!;
     this.landmarkPosition = this.landmarkDom.createSVGPoint();
-    this.landmarkPosition.x = 768;
-    this.landmarkPosition.y = 432;
+    this.landmarkPosition.x = 960;
+    this.landmarkPosition.y = 540;
+  }
+  ngAfterViewChecked(): void {
+    //If waiting for a DOM element to be created to add a drag/rotate/resize box. Perhaps not the ideal approach, but it should be fine for now
+    if(this.newId !== null) {
+      this.destroyDraggable();
+      //this.draggable = subjx('#' + this.newId).drag();
+      if(this.newId[0] === 'i') {
+        //this.draggable['model'] = this.currentLandmark.imageContent[this.newId];
+        this.createImageDraggable(this.newId);
+      }
+      this.newId = null;
+    }
   }
 
   public addImage(event: any) {
@@ -59,7 +73,9 @@ export class ViewComponent implements OnInit {
             'x': resp.x, 'y': resp.y, 'width': resp.width, 'height': resp.height,
             'image': resp.image, 'transformation': [1,0,0,1,0,0]
           });
-          this.currentLandmark.imageContent.push(imgObj);
+          //this.currentLandmark.imageContent.push(imgObj);
+          this.currentLandmark.imageContent[imgObj.id] = imgObj;
+          this.newId = imgObj.id;
         })
       };
     });
@@ -67,9 +83,59 @@ export class ViewComponent implements OnInit {
   }
   protected clickLandmark(event: any) {
       //This is slightly sketchy, I may admit. It may be better to create a temporary SVG point with the client values.
-      this.landmarkPosition.x = event.clientX;
-      this.landmarkPosition.y = event.clientY;
-      this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
+      if(event.target !== this.landmarkDom) {
+        if(event.target.classList.contains('image-content')) {
+          if(this.draggable === null) {
+            //Make new draggable
+            this.createImageDraggable(event.target.id);
+          }
+          else if(event.target.id !== this.draggable['model'].id) {
+            //Destroy existing draggable
+            this.destroyDraggable();
+            //Make new draggable
+            this.createImageDraggable(event.target.id);
+          }
+        }
+      }
+      else {
+        this.landmarkPosition.x = event.clientX;
+        this.landmarkPosition.y = event.clientY;
+        this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
+      }
+  }
+  private destroyDraggable() {
+    this.draggable['model'].updateContent(this.draggable.elements[0]);
+    this.contentManager.updateContent(this.draggable['model'])
+    .subscribe((resp) => {
+      console.log(resp);
+    })
+    this.draggable.disable();
+    this.draggable = null;
+  }
+  private createImageDraggable(id: string) {
+    //Create the subjx instance
+    this.draggable = subjx('#' + id).drag();
+
+    this.draggable['model'] = this.currentLandmark.imageContent[id]; //Maintain a reference to the original object
+    this.draggable['options']['proportions'] = true; //By default, preserve the aspect ratio
+    this.draggable['options']['scalable'] = true; //Image will fit to the box
+
+    this.draggable.on('resizeStart', () => { this.draggable['aspectRatioSet'] = false; }); //Need to wait to see whether the resize comes from the sides or the corners
+    this.draggable.on('resize', (e:any) => {
+      if(!this.draggable['aspectRatioSet']) {
+        //If the resize event comes from the sides, do not maintain the aspect ratio
+        if(e.mouseEvent.path[0] === this.draggable.storage.handles['bc'] || e.mouseEvent.path[0] === this.draggable.storage.handles['tc'] || e.mouseEvent.path[0] === this.draggable.storage.handles['ml'] || e.mouseEvent.path[0] === this.draggable.storage.handles['mr']) {
+          this.draggable['options']['proportions'] = false;
+          this.draggable['aspectRatioSet'] = true;
+        }
+        //Otherwise, preserve the aspect ratio
+        else if(e.mouseEvent.path[0] === this.draggable.storage.handles['bl'] || e.mouseEvent.path[0] === this.draggable.storage.handles['tl'] || e.mouseEvent.path[0] === this.draggable.storage.handles['br'] || e.mouseEvent.path[0] === this.draggable.storage.handles['tr']) {
+          this.draggable['aspectRatioSet'] = true;
+        }
+      }
+    });
+    //Reset the defaults
+    this.draggable.on('resizeEnd', () => {this.draggable['options']['proportions'] = true;})
   }
 
 

@@ -41,15 +41,6 @@ export class ContentService {
     this.mainPaths[pathResponse['mapId']] = new Path(pathResponse);
   }
   //HTTP POST REQUESTS
-  /*public uploadImage(imageFile: File, landmarkId: number, tempId: string) {
-    const uploadData = new FormData();
-    uploadData.append("landmarkId", landmarkId.toString());
-    uploadData.append("tempId", tempId);
-    uploadData.append("image", imageFile);
-    return this.http.post(this.url + 'create-image/', uploadData);
-  }*/
-
-
   public createMap(userId: string): Observable<any> {
     return this.http.post(this.url + 'create-map/', {
       "owner": userId
@@ -64,23 +55,20 @@ export class ContentService {
     uploadData.append("width", width.toString());
     uploadData.append("height", height.toString());
     uploadData.append("image", image);
-
-    /* const uploadData = new FormData();
-    const posData = {
-      landmarkId,
-      x,
-      y,
-      width,
-      height
-    };
-    const blob = new Blob([JSON.stringify(posData)], {type: 'application/json'});
-    uploadData.append('data', blob);
-    //uploadData.append(new Blob([JSON.stringify(value={landmarkId, x, y, width, height, transformation})], {type: 'application.json'}))
-    uploadData.append('image', image);
- */
-    //const uploadData = {'landmarkId': landmarkId, 'x': x, 'y': y, 'width': width, 'height': height, 'image': image};
     return this.http.post(this.url + 'create-image/', uploadData);
   }
+  //HTTP PUT REQUESTS
+  private updateImageBox(imageBox: ImageBox) {
+    return this.http.put(this.url + 'image-boxes/' + imageBox.id.slice(1) + '/', imageBox.formatHttp());
+  }
+
+  public updateContent(box: any) {
+    if(box.id[0] == 'i') {
+      return this.updateImageBox(box);
+    }
+    return this.updateImageBox(box); //TODO: TEMP
+  }
+
   //HTTP OR LOCAL GET REQUESTS
   public checkMap(id: number): Map | null {
     if(id in this.maps) {

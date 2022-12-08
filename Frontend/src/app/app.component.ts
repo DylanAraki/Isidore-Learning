@@ -39,7 +39,8 @@ export class AppComponent {
                 "landmarks": [
                   {
                     "id": data["firstLandmark"],
-                    "previousLandmark": null
+                    "previousLandmark": null,
+                    "images": [],
                   }
                 ]
               }
