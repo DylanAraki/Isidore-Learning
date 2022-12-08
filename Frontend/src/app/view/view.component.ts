@@ -4,8 +4,9 @@ import { ContentService } from '../content.service';
 import { generateSquarePath, DEFAULT_RADIUS, generateTrianglePath, generateCirclePath, generateRightTrianglePath, generateParallelogram } from '../shapes';
 import { ChangeDetectorRef } from '@angular/core';
 
-
 const subjx = require('../../../node_modules/subjx/dist/js/subjx'); //TODO: Try to avoid this
+
+
 
 @Component({
   selector: 'app-view',
@@ -13,23 +14,72 @@ const subjx = require('../../../node_modules/subjx/dist/js/subjx'); //TODO: Try 
   styleUrls: ['./view.component.css']
 })
 export class ViewComponent implements OnInit {
-  @Input() h!: number;
-  @Input() w!: number;
-  @Input() currentLandmark!: Landmark;
 
-  private svgDom: any; //TODO: Typecast properly
-  private svgPoint: any; //TODO: Ditto
-  private svgPosition: [number, number] = [0, 0];
-  private contentCount!: number;
-  protected draggable: any = null; //TODO: Typecast properly
+  //private svgPoint: any; //TODO: Ditto
+  //private svgPosition: [number, number] = [0, 0];
+  //private contentCount!: number;
+  //protected draggable: any = null; //TODO: Typecast properly
   //protected tempTextBox: TextBox;
-  protected textObserver: ResizeObserver;;
+  //protected textObserver: ResizeObserver;;
 
-  constructor(private contentManager: ContentService, private ref: ChangeDetectorRef) {
+
+  
+  @Input() editMode: boolean = false;
+  @Input() currentLandmark!: Landmark;
+  private landmarkDom: any; //Typecast better
+  private landmarkPosition: any;
+
+  constructor(private contentManager: ContentService) {}
+  ngOnInit(): void {
+
+  }
+  ngAfterViewInit(): void {
+    //Maintain a reference to the landmark display's DOM element
+    this.landmarkDom = document.getElementById("landmark-display")!;
+    this.landmarkPosition = this.landmarkDom.createSVGPoint();
+    this.landmarkPosition.x = 768;
+    this.landmarkPosition.y = 432;
+  }
+
+  public addImage(event: any) {
+    //Get the uploaded file
+    const imgFile = event.target.files[0];
+
+     //Process the file
+     const reader = new FileReader();
+     reader.onload = (event => {
+      const img = new Image();
+      img.src = reader.result as string;
+      img.onload = () => {
+        //Save the file
+        this.contentManager.createImageBox(this.currentLandmark.getId(), Math.floor(this.landmarkPosition.x - img.width / 2), Math.floor(this.landmarkPosition.y - img.height / 2), img.width, img.height, [1,0,0,1,0,0], imgFile)
+        .subscribe((resp) => {
+          const imgObj = new ImageBox({
+            'id': resp.id, 'landmarkId': resp.landmarkId,
+            'x': resp.x, 'y': resp.y, 'width': resp.width, 'height': resp.height,
+            'image': resp.image, 'transformation': [1,0,0,1,0,0]
+          });
+          this.currentLandmark.imageContent.push(imgObj);
+        })
+      };
+    });
+    reader.readAsDataURL(imgFile);
+  }
+  protected clickLandmark(event: any) {
+      //This is slightly sketchy, I may admit. It may be better to create a temporary SVG point with the client values.
+      this.landmarkPosition.x = event.clientX;
+      this.landmarkPosition.y = event.clientY;
+      this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
+  }
+
+
+
+
+  //constructor(private contentManager: ContentService, private ref: ChangeDetectorRef) {
     
     //this.tempTextBox = new TextBox({ 'id': 0, 'landmarkId': 0, 'x': 0, 'y': 0, 'width': 50, 'height': 20, 'content': Array.of('') }, false); //TODO: This is just a hack...
 
-    this.textObserver = new ResizeObserver(entries => {
+    /*this.textObserver = new ResizeObserver(entries => {
       if (entries[0].contentRect) {
         //console.log(this.tempTextBox.height);
         //this.tempTextBox.height = this.tempTextBox.height < entries[0].contentRect.height ? entries[0].contentRect.height : this.tempTextBox.height;
@@ -37,48 +87,18 @@ export class ViewComponent implements OnInit {
         //this.ref.markForCheck();
 
       }
-    });
-  }
+    });*/
+  //}
 
-  ngOnInit(): void {
-    this.svgDom = document.getElementsByTagName("svg")[0];
-    this.svgPoint = this.svgDom.createSVGPoint();
+  /* ngOnInit(): void {
+    //this.svgDom = document.getElementsByTagName("svg")[0];
+    //this.svgPoint = this.svgDom.createSVGPoint();
     //this.contentCount = Object.keys(this.currentLandmark.getContent()).length; //TODO: Need a better way of mapping unsaved data
 
 
-  }
-  /*
-  public addImage(event: any) {
-    //Get the uploaded file
-    const imgFile = event.target.files[0];
+  } */
 
-    //Process the file
-    const reader = new FileReader();
-    reader.onload = (event => {
-      const img = new Image();
-      img.src = reader.result as string;
-      img.onload = () => {
-        //Create new image box object
-        this.contentCount++;
-        const imgObj = new ImageBox({
-          "id": this.contentCount.toString(), "landmarkId": this.currentLandmark.getId().toString(),
-          "x": this.svgPosition[0].toString(), "y": this.svgPosition[1].toString(),
-          "width": img.width.toString(), "height": img.height.toString(),
-          "src": img.src
-        }, false);
-        //Update the local landmark object to include the object
-        this.currentLandmark.addContent(imgObj);
-        //Upload the image box to the server TODO: Set callback
-        this.contentManager.createImageBox(imgFile, imgObj)
-          .subscribe(e => {
-            console.log(e);
-          })
-        //Reset the SVG position
-        this.svgPosition = [0, 0];
-      };
-    });
-    reader.readAsDataURL(imgFile);
-  }
+  /*
   public addShape(shape: string) {
     //Generate the 'd' value to create an SVG path
     let newPath: string | undefined = undefined;

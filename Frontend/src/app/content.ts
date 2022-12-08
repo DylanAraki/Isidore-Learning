@@ -1,3 +1,11 @@
+export class Changes {
+    deletions: {[id: number | string]: any} = {};
+    creations: {[id: number | string]: any} = {};
+    updates: {[id: number | string]: [any, string[]]} = {};
+}
+
+
+
 //TODO: When back, restructure the classes with aim of pushing data into the template and saving it to the database.
 export class Map {
     private id: number;
@@ -29,6 +37,8 @@ export class Map {
         }
         this.lastSaved = new Date(mapResponse['lastSaved']);
     }
+    public getOwner() { return this.owner; }
+    public getTitle() { return this.title; }
 }
 export class Path {
     private id: number;
@@ -45,28 +55,63 @@ export class Path {
             this.landmarks.push(new Landmark(landmarkResponse));
         }
     }
-    public getId() {
-        return this.id;
-    }
-    public getFirstLandmark() {
-        return this.landmarks[0];
-    }
+    public getId() { return this.id; }
+    public getFirstLandmark() { return this.landmarks[0]; }
 }
 export class Landmark {
     private id: number;
     private numAnimations: number = 1;
     private nextLandmark: Landmark | null = null;
     //private legend
-    private textContent: {[key:string]: TextBox} = {};
-    private shapeContent: {[key:string]: ShapeBox} = {};
-    private imageContent: {[key:string]: ImageBox} = {};
+    //private textContent: {[key:string]: TextBox} = {};
+    //private shapeContent: {[key:string]: ShapeBox} = {};
+    //public imageContent: {[key:string]: ImageBox} = {};
+    public imageContent: ImageBox[] = [];
 
     constructor(landmarkResponse: {[key:string]: any}) {
         this.id = landmarkResponse['id'];
         if('nextLandmark' in landmarkResponse) {
-            this.nextLandmark = landmarkResponse['id'];
+            this.nextLandmark = landmarkResponse['nextLandmark'];
+        }
+        for(let imageResponse of landmarkResponse['images']) {
+            this.imageContent.push(new ImageBox(imageResponse));
         }
     }
+    public getId(): number { return this.id; }
+    //public addImage(newImage: ImageBox): void { this.imageContent[newImage.getId()] = newImage; }
+}
+export class ImageBox {
+    id: string; //Displayed on CSS
+    landmarkId: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    transformation: DOMMatrix;
+    //saved: boolean;
+    image: string;
+
+    constructor(imageResponse: {[key: string]: any}) {
+        /* this.saved = saved;
+        if(this.saved) {
+            this.id = 'io' + imageResponse['id'].toString();
+            this.src = "http://localhost:8000/images/" + imageResponse['id'].toString() + '/';            
+        }
+        else {
+            this.id = 'in' + imageResponse['id'].toString();
+            this.src = imageResponse['src'];
+        } */
+        this.id = 'i' + imageResponse['id'].toString();
+        this.landmarkId = imageResponse['landmarkId'];
+        this.x = imageResponse['x'];
+        this.y = imageResponse['y'];
+        this.width = imageResponse['width'];
+        this.height = imageResponse['height'];
+        this.transformation = new DOMMatrix(imageResponse['transformation']);
+        this.image = imageResponse['image'];
+    }
+
+    public getId(): string { return this.id; }
 }
 export class TextBox {
 
@@ -74,9 +119,7 @@ export class TextBox {
 export class ShapeBox {
 
 }
-export class ImageBox {
 
-}
 
 
 

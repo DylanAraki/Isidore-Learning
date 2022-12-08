@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
-from .hidden import DATABASE_PASSWORD, MY_SECRET_KEY
+from .hidden import DATABASE_PASSWORD, MY_AWS_SECRET_ACCESS_KEY, MY_SECRET_KEY, MY_AWS_ACCESS_KEY_ID
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,8 +32,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "corsheaders",
+    'corsheaders',
     'config',
+    'storages',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,8 +44,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware", #TODO: DELETE LATER?
-    "django.middleware.common.CommonMiddleware", #TODO: DELETE LATER?
+    'corsheaders.middleware.CorsMiddleware', #TODO: DELETE LATER?
+    'django.middleware.common.CommonMiddleware', #TODO: DELETE LATER?
 
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -82,7 +83,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Test',
+        'NAME': 'Isidore-Learning',
         'USER': 'postgres',
         'PASSWORD': DATABASE_PASSWORD,
         'HOST': 'localhost',
@@ -131,6 +132,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+AWS_ACCESS_KEY_ID = MY_AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY = MY_AWS_SECRET_ACCESS_KEY
+AWS_STORAGE_BUCKET_NAME = 'isidore-learning-files'
 
 #TODO: DELETE?
 CORS_ALLOWED_ORIGINS = [

@@ -8,11 +8,15 @@ class ImageSerializer(serializers.ModelSerializer):
         model = ImageBox
         fields = ['id', 'landmarkId', 'x', 'y', 'width', 'height']
 """
+class ImageBoxSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImageBox
+        fields = ['id', 'landmarkId', 'x', 'y', 'width', 'height', 'image']
 class LandmarkSerializer(serializers.ModelSerializer):
-    #image = ImageSerializer(many=True, read_only=True)
+    images = ImageBoxSerializer(many=True, read_only=True)
     class Meta:
         model = Landmark
-        fields = ['id', 'pathId', 'nextLandmark']
+        fields = ['id', 'pathId', 'nextLandmark', 'images']
 
 class PathSerializer(serializers.ModelSerializer):
     landmarks = LandmarkSerializer(many=True, read_only=True)
@@ -25,9 +29,3 @@ class MapSerializer(serializers.ModelSerializer):
         #fields = ['id', 'owner', 'title', 'publicity', 'description', 'topic']
         fields = ['id', 'owner', 'lastSaved']
         #TODO: Depth?
-
-
-class ImageBoxSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ImageBox
-        fields = ['id', 'x', 'y', 'width', 'height']

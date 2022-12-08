@@ -1,23 +1,35 @@
-<div class="top">
-    <!--
-    <input type="file" (change)="view.addImage($event)">
-    <button (click)="view.addShape('square')">Square</button>
-    <button (click)="view.addShape('circle')">Circle</button>
-    <button (click)="view.addShape('triangle')">Triangle</button>
-    <button (click)="view.addShape('right triangle')">Right Triangle</button>
-    <button (click)="view.addShape('parallelogram')">Parallelogram</button>
-    <button (click)="lineOptions()">Create line</button>
-    -->
-</div>
-<ng-container #editOptions></ng-container>
-<div class="bot">
-    <nav class="vertical-nav">
-        <app-vertical-trail></app-vertical-trail>
-    </nav>
-    <main class="svg-wrapper" [ngStyle]="{'width': width.toString()+'px', 'height': height.toString()+'px'}">
-        <app-view [h]="0.9*height" [w]="0.9*width" [currentLandmark]="currentLandmark" #view></app-view>
-    </main>
-    <aside class="legend">
-        <app-legend></app-legend>
-    </aside>
+<div *ngIf="state !== undefined && currentMap !== undefined" class="edit-wrap">
+    <div class="top">
+        <h1>{{currentMap.getTitle()}}</h1>
+
+        <fa-icon [icon]="faImage" (click)="selectedIcon === ICON_SELECTED.IMAGE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.IMAGE"></fa-icon>
+        <input *ngIf="selectedIcon === ICON_SELECTED.IMAGE" type="file" (change)="view.addImage($event); selectedIcon = ICON_SELECTED.NONE;">
+        <!--
+        <button (click)="view.addShape('square')">Square</button>
+        <button (click)="view.addShape('circle')">Circle</button>
+        <button (click)="view.addShape('triangle')">Triangle</button>
+        <button (click)="view.addShape('right triangle')">Right Triangle</button>
+        <button (click)="view.addShape('parallelogram')">Parallelogram</button>
+        <button (click)="lineOptions()">Create line</button>
+        -->
+    </div>
+    <div class="bot">
+        <nav *ngIf="state.length > 1" class="vertical-nav">
+            <app-vertical-trail></app-vertical-trail>
+        </nav>
+        <main class="landmark-wrapper">
+            <app-view [editMode]="true" [currentLandmark]="state[state.length-1][1]" #view></app-view>
+
+
+            <!--
+        <main class="svg-wrapper" [ngStyle]="{'width': width.toString()+'px', 'height': height.toString()+'px'}">
+            
+            <app-view [h]="0.9*height" [w]="0.9*width" [currentLandmark]="currentLandmark" #view></app-view>
+        -->
+        </main>
+        <aside class="legend">
+            <app-legend></app-legend>
+        </aside>
+    </div>
+    <ng-container #editOptions></ng-container>
 </div>

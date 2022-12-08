@@ -2,13 +2,17 @@ import base64
 import json
 from django import forms
 from django.http import JsonResponse
-from .models import ImageBox, LegendEntry, Map, Path, Landmark, ShapeBox, TextBox
-from .serializers import MapSerializer, PathSerializer, LandmarkSerializer
+from .models import ImageBox, Map, Path, Landmark
+from .serializers import ImageBoxSerializer, MapSerializer, PathSerializer, LandmarkSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from base64 import decodebytes
 from datetime import datetime, timezone
+
+
+import uuid
+
 
 
 #TODO: integrate w/ API Gateway
@@ -74,18 +78,46 @@ def getMainPath(request, id):
         return Response(status=status.HTTP_404_NOT_FOUND)
     
     pathSerializer = PathSerializer(path)
-    print(pathSerializer.data)
     return Response(pathSerializer.data, status=status.HTTP_200_OK)
 
 
+""" @api_view(['PUT'])
+def save(request):
+    #print(request.data['creations'])
+    #Deletions
+
+
+    #Creations
+    for id, value in request.data['creations'].items():
+        if id[0] == 'i': #Image
+            serializer = ImageBoxSerializer(data={'landmarkId': value['landmarkId'], 'x': round(value['x']), 'y': round(value['y']), 'width': round(value['width']), 'height': round(value['height'])})
+            if serializer.is_valid:
+                #Save the image
+                file = request.FILES.get('src')
+                print(file) #As images involve file uploads, perhaps they should be handled separately...
+                    
+
+
+                #serializer.save()
+            else:
+                print("ANGRY COSTUME")
+
+            
+    
+
+    #Updates
+    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR) """
 
 
 
 @api_view(['POST'])
 def createImage(request):
-    #TODO: Setup properly
-    file = request.FILES.get('image')
-    with open('images/test.jpg', 'wb+') as destination:
-        for chunk in file.chunks():
-            destination.write(chunk)
-    return Response(status=status.HTTP_201_CREATED)
+    imageFile = request.FILES.get('image')
+    imageFile.name = str(uuid.uuid4())
+    
+    serializer = ImageBoxSerializer(data={'landmarkId': int(request.POST.get('landmarkId')), 'x': int(request.POST.get('x')), 'y': int(request.POST.get('y')), 'width': int(request.POST.get('width')), 'height': int(request.POST.get('height')), 'image': imageFile})
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -1,27 +1,79 @@
-.top {
-    height: 100px;
+fa-icon {
+    font-size: 30px;
+}
+
+.edit-wrap {
+    display: grid;
+    grid-template-rows: 100px calc(100vh - 150px); /*Rather uneasy about this*/
 }
 .bot {
-    height: calc(100vh - 150px); /*50 px for the header and 100 px for the top bar. TODO: Substitute variables*/
-    top: 150px;
+    background-color: #e6e6e6;
     display: flex;
-    width: 100vw;
-    flex-direction: row;
-    position: absolute;
 }
 .vertical-nav {
-    width: 100px;
-    height: 100%;
+    flex-shrink: 0;
+    width: min(150px, 10vw);
+    background-color: green;
+}
+.landmark-wrapper {
+    margin: 2.5%;
+    flex-grow: 1;
 }
 .legend {
-    width: 100px;
-    height: 100%;
-    
+    flex-shrink: 0;
+    width: min(150px, 10vw);
+    background-color: yellow;
 }
-/*.svg-wrapper {
-    background-color: #e6e6e6;
-    padding: 5%;
+app-view {
+    height: 100%;
+    width: 100%;
+
     display: flex;
     justify-content: center;
     align-items: center;
-}*/
+}
+
+
+
+
+/*.edit-wrap {
+
+}
+.top {
+    background-color: blue;
+}
+.bot {
+    background-color: #e6e6e6;
+    display: flex;
+    overflow-y: hidden;
+}
+
+.vertical-nav {
+    width: 150px;
+    background-color: yellow;
+}
+.legend {
+    width: 150px;
+    background-color: red;
+}
+
+
+.landmark-wrapper {
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding: 2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+app-view {
+    height: 100%;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+*/

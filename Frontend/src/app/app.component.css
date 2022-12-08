@@ -1,6 +1,6 @@
-header {
-    height: 50px;
-}
 #site-nav {
     display: flex;
+}
+header {
+    height: 50px;
 }

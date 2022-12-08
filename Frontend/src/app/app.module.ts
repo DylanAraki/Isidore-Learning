@@ -15,6 +15,7 @@ import { LineOptionsComponent } from './line-options/line-options.component';
 import { LegendComponent } from './legend/legend.component';
 import { VerticalTrailComponent } from './vertical-trail/vertical-trail.component';
 import { HorizontalTrailComponent } from './horizontal-trail/horizontal-trail.component';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   declarations: [
@@ -34,7 +35,8 @@ import { HorizontalTrailComponent } from './horizontal-trail/horizontal-trail.co
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    FontAwesomeModule
   ],
   providers: [],
   bootstrap: [AppComponent]

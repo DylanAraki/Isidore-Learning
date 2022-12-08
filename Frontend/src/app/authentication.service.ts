@@ -6,11 +6,27 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class AuthenticationService {
+  private currentUser: any;
 
   constructor() { 
     Amplify.configure({
       Auth: environment.cognito
     });
+
+    Auth.currentUserInfo()
+    .then((user) => {
+      this.currentUser = user; //can be null
+    })
+  }
+
+  //USER INFO TODO: Check if change?
+  //public getCurrentUser(): Promise<any> {
+  public getCurrentUser(): any {
+    return this.currentUser;
+    //return Auth.currentUserInfo()
+  }
+  public getCurrentUserSession(): Promise<any> {
+    return Auth.currentSession();
   }
 
   //SIGN IN
@@ -49,13 +65,7 @@ export class AuthenticationService {
     return Auth.forgotPasswordSubmit(uuid, verificationCode, newPassword)
   }
 
-  //USER INFO TODO: Check if change?
-  public getCurrentUser(): Promise<any> {
-    return Auth.currentUserInfo()
-  }
-  public getCurrentUserSession(): Promise<any> {
-    return Auth.currentSession();
-  }
+  
 
 
   //TODO: Add update and delete functionality.

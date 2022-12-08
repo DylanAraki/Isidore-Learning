@@ -1,9 +1,13 @@
-import { Component, OnInit, HostListener, ViewChild, ViewContainerRef } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, HostListener, ViewChild, ViewContainerRef, ApplicationRef, Type } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ContentDisplay } from '../content-display';
 import { ContentService } from '../content.service';
 import { LineOptionsComponent } from '../line-options/line-options.component';
 import { Map, Path, Landmark } from '../content';
+import { AuthenticationService } from '../authentication.service';
+import { faImage } from '@fortawesome/free-solid-svg-icons';
+import { ICON_SELECTED } from '../enums';
+
 
 @Component({
   selector: 'app-edit',
@@ -11,76 +15,116 @@ import { Map, Path, Landmark } from '../content';
   styleUrls: ['./edit.component.css']
 })
 export class EditComponent implements OnInit {
-  @ViewChild('editOptions', {read: ViewContainerRef})
-  editOptions!: ViewContainerRef
-  
+  /* @ViewChild('editOptions', { read: ViewContainerRef })
+  editOptions!: ViewContainerRef */
 
-  height!: number
-  width!: number
+
+  //height!: number
+  //width!: number
   //@ViewChild(selector: 'edit-options', opts:{read: ViewContainerRef}, container: ViewContainerRef)
-  currentPath!: Path
-  currentLandmark!: Landmark
+  //currentPath!: Path
+  //currentLandmark!: Landmark
+  /* private landmarkElement!: Element;
+  public height!: number;
+  public width!: number; */
 
+  
+  
+  
+  ICON_SELECTED = ICON_SELECTED;
 
+  protected selectedIcon: ICON_SELECTED = ICON_SELECTED.NONE;
+  protected faImage = faImage;
 
-  currentMap!: Map
-  state: [Path, Landmark][] = [];
+  protected currentMap!: Map
+  protected state!: [Path, Landmark][];
 
-
-  constructor(private contentManager: ContentService, private route: ActivatedRoute) { 
-    this.getScreenSize();
+  constructor(private contentManager: ContentService, private route: ActivatedRoute, private router: Router, private authenticator: AuthenticationService) {
   }
-
-  @HostListener('window:resize', ['$event'])
-  getScreenSize(event?: any) {
-   this.height = window.innerHeight - 150; //50px for the site header and 100px for the top bar
-   this.width = window.innerWidth - 200; //100px for the legend and vertical trail
-   console.log(this.height);
-   console.log(this.width);
-  }
-
+  
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if(id !== null) {
+
+    //Get the editable objects (while making sure the user has access to the route)
+    if (id !== null && this.authenticator.getCurrentUser() !== null) {
+
+      //Get the map
       let map = this.contentManager.checkMap(+id);
-      if(map !== null) {
-        this.currentMap = map;
-        console.log(this.currentMap);
+      if (map !== null) {
+        this.authenticator.getCurrentUserSession()
+          .then((userSession) => {
+            if (userSession.idToken.payload.sub === map!.getOwner()) {
+              this.currentMap = map!;
+            }
+            else {
+              this.router.navigate(['../../'], { relativeTo: this.route });
+            }
+          })
       }
       else {
         this.contentManager.getMap(+id)
-        .subscribe((mapResponse) => {
-          this.contentManager.addMapToDictionary(mapResponse);
-          map = this.contentManager.checkMap(+id)!;
-          this.currentMap = map;
-          console.log(this.currentMap);
-        })
+          .subscribe((mapResponse) => {
+            this.contentManager.addMapToDictionary(mapResponse);
+            map = this.contentManager.checkMap(+id)!;
+
+            this.authenticator.getCurrentUserSession()
+            .then((userSession) => {
+              if (userSession.idToken.payload.sub === map!.getOwner()) {
+                this.currentMap = map!;
+              }
+              else {
+                this.router.navigate(['../../'], { relativeTo: this.route });
+              }
+            })
+          })
       }
 
+      //Get the path
       let path = this.contentManager.checkMainPath(+id);
-      if(path !== null) {
-        this.state.push([path, path.getFirstLandmark()]);
-        console.log(this.state);
+      if (path !== null) {
+        //this.state.push([path, path.getFirstLandmark()]);
+        this.state = Array.of([path, path.getFirstLandmark()]);
       }
       else {
         this.contentManager.getMainPath(+id)
-        .subscribe((pathResponse) => {
-          this.contentManager.addMainPathToDictionary(pathResponse);
-          path = this.contentManager.checkMainPath(+id)!;
-          this.state.push([path, path.getFirstLandmark()]);
-          console.log(this.state)
-        })
+          .subscribe((pathResponse) => {
+            this.contentManager.addMainPathToDictionary(pathResponse);
+            path = this.contentManager.checkMainPath(+id)!;
+            //this.state.push([path, path.getFirstLandmark()]);
+            this.state = Array.of([path, path.getFirstLandmark()]);
+          })
       }
     }
     else {
-      //TODO: redirect
+      //TODO: Fix this
+      this.router.navigate(['../../'], { relativeTo: this.route });
     }
   }
 
 
-  protected lineOptions() {
+
+/*   protected lineOptions() {
     this.editOptions.clear();
     this.editOptions.createComponent(LineOptionsComponent);
-  }
+  } */
+/*
+  @HostListener('window:resize', ['$event'])
+  getScreenSize(event?: any) {
+    //this.appRef.tick();
+    //this.width = this.landmarkElement.clientWidth;
+    //this.height = this.landmarkElement.clientHeight;
+    console.log(window.innerHeight);
+    console.log(window.innerWidth);
 
+    /*this.height = window.innerHeight - 150; //50px for the site header and 100px for the top bar
+    this.width = window.innerWidth - 200; //100px for the legend and vertical trail
+    console.log(this.height);
+    console.log(this.width);
+
+
+    this.landmarkElement = document.getElementsByTagName('app-view')[0];
+    this.width = this.landmarkElement.clientWidth;
+    this.height = this.landmarkElement.clientHeight;
+    
+  }*/
 }

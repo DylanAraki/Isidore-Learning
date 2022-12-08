@@ -32,6 +32,19 @@ class Landmark(models.Model):
     nextLandmark = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
     numAnimations = models.SmallIntegerField(default=1)
 
+class ImageBox(models.Model):
+    landmarkId = models.ForeignKey(Landmark, on_delete=models.CASCADE, related_name="images")
+    x = models.IntegerField()
+    y = models.IntegerField()
+    width = models.IntegerField()
+    height = models.IntegerField()
+    image = models.FileField(upload_to='image-boxes/', unique=True) 
+    #TODO: transformation is an array of size 6 of integers
+    animationAppearance = models.SmallIntegerField(default=0)
+
+ 
+
+"""
 class LegendEntry(models.Model):
     landmarkId = models.ForeignKey(Landmark, on_delete=models.CASCADE, related_name='legend')
     nextEntry = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
@@ -56,17 +69,8 @@ class ShapeBox(models.Model):
     animationAppearance: models.SmallIntegerField(default=0)
     #TODO: Here, an array of letters plus up to 4 commands. For now, this can be an array directly
 
-class ImageBox(models.Model):
-    landmarkId = models.ForeignKey(Landmark, on_delete=models.CASCADE, related_name="image")
-    x: models.IntegerField()
-    y: models.IntegerField()
-    width: models.IntegerField()
-    height: models.IntegerField()
-    #Image will be named based on primary key. 
-    #TODO: transformation is an array of size 6 of integers
-    animationAppearance: models.SmallIntegerField(default=0)
-
 class Notifications(models.Model):
     notificationMessage: models.CharField(max_length=500)
     sender: models.CharField(max_length=50)
     receiever: models.CharField(max_length=50)
+"""
