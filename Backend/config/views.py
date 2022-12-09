@@ -109,3 +109,20 @@ def updateImage(request, id):
     #TODO: Add error checking
     ImageBox.objects.filter(id = id).update(x = request.data['x'], y = request.data['y'], width = request.data['width'], height = request.data['height'], transformation = request.data['transformation'])
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+def updateLandmarkOrder(request, id):
+    landmarkObj = Landmark.objects.get(pk=id)
+    if landmarkObj:
+        landmarkObj.order= request.data['order']
+        landmarkObj.save(update_fields=['order'])
+        return Response(status=status.HTTP_200_OK)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    """ updateSuccessful = Landmark.objects.get(pk=id).update(order=request.data['order']).exists()
+    if updateSuccessful:
+        
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST) """

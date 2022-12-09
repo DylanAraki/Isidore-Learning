@@ -16,7 +16,9 @@ import { LegendComponent } from './legend/legend.component';
 import { VerticalTrailComponent } from './vertical-trail/vertical-trail.component';
 import { HorizontalTrailComponent } from './horizontal-trail/horizontal-trail.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-//import { DragDropModule } from '@angular/cdk/drag-drop';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+
 
 
 @NgModule({
@@ -31,14 +33,17 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     LineOptionsComponent,
     LegendComponent,
     VerticalTrailComponent,
-    HorizontalTrailComponent
+    HorizontalTrailComponent,
+    
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
     HttpClientModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    BrowserAnimationsModule,
+    DragDropModule
   ],
   providers: [],
   bootstrap: [AppComponent]

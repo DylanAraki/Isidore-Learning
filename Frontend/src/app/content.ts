@@ -90,6 +90,7 @@ export class Landmark {
     }
     public getId(): number { return this.id; }
     public getOrder(): number { return this.order; }
+    public setOrder(newOrder: number) { this.order = newOrder;  }
     //public addImage(newImage: ImageBox): void { this.imageContent[newImage.getId()] = newImage; }
 }
 export class ImageBox {

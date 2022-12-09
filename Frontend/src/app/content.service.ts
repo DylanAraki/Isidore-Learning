@@ -67,6 +67,9 @@ export class ContentService {
   private updateImageBox(imageBox: ImageBox) {
     return this.http.put(this.url + 'image-boxes/' + imageBox.id.slice(1) + '/', imageBox.formatHttp());
   }
+  public updateLandmarkOrder(id: number, newOrder: number): Observable<any> {
+    return this.http.put(this.url + 'landmark-order/' + id.toString() + '/', {'order': newOrder});
+  }
 
   public updateContent(box: any) {
     if(box.id[0] == 'i') {
