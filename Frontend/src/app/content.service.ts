@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { Changes, ImageBox, Map, Path } from './content'
+import { Changes, ImageBox, Landmark, Map, Path } from './content'
 
 @Injectable({
   providedIn: 'root'
@@ -46,7 +46,13 @@ export class ContentService {
       "owner": userId
     })
   }
-  
+  public createLandmark(offset: number, pathId: number, adjacentLandmark: Landmark): Observable<any> {
+    return this.http.post(this.url + 'landmark/', 
+    {
+      'pathId': pathId,
+      'order': adjacentLandmark.getOrder() + offset
+    });
+  }
   public createImageBox(landmarkId: number, x: number, y: number, width: number, height: number, transformation: number[], image: File): Observable<any> {
     const uploadData = new FormData();
     uploadData.append("landmarkId", landmarkId.toString());

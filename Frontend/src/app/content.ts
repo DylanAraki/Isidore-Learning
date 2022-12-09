@@ -58,12 +58,20 @@ export class Path {
     }
     public getId() { return this.id; }
     public getFirstLandmark() { return this.landmarks[0]; }
+    public getLastLandmark() { return this.landmarks[this.landmarks.length - 1] }
     public getLandmarks() { return this.landmarks; }
+    public addToFrontOfLandmarks(landmark: Landmark) {
+        this.landmarks.unshift(landmark)
+    }
+    public addToBackOfLandmarks(landmark: Landmark) {
+        this.landmarks.push(landmark);
+    }
 }
 export class Landmark {
     private id: number;
     private numAnimations: number = 1;
-    private previousLandmarkId: number | null = null;
+    private order: number;
+    //private previousLandmarkId: number | null = null;
     //private legend
     //private textContent: {[key:string]: TextBox} = {};
     //private shapeContent: {[key:string]: ShapeBox} = {};
@@ -74,15 +82,14 @@ export class Landmark {
 
     constructor(landmarkResponse: {[key:string]: any}) {
         this.id = landmarkResponse['id'];
-        if('previousLandmark' in landmarkResponse) {
-            this.previousLandmarkId = landmarkResponse['previousLandmark'];
-        }
+        this.order = landmarkResponse['order'];
         for(let imageResponse of landmarkResponse['images']) {
             //this.imageContent.push(new ImageBox(imageResponse));
             this.imageContent['i' + imageResponse['id']] = new ImageBox(imageResponse);
         }
     }
     public getId(): number { return this.id; }
+    public getOrder(): number { return this.order; }
     //public addImage(newImage: ImageBox): void { this.imageContent[newImage.getId()] = newImage; }
 }
 export class ImageBox {

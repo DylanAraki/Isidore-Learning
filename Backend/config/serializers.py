@@ -10,13 +10,14 @@ class LandmarkSerializer(serializers.ModelSerializer):
     images = ImageBoxSerializer(many=True, read_only=True)
     class Meta:
         model = Landmark
-        fields = ['id', 'pathId', 'previousLandmark', 'images']
+        fields = ['id', 'pathId', 'order', 'images']
 
 class PathSerializer(serializers.ModelSerializer):
     landmarks = LandmarkSerializer(many=True, read_only=True)
     class Meta:
         model = Path 
         fields = ['id', 'mapId', 'isMainPath', 'landmarks']
+
 class MapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Map

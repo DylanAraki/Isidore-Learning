@@ -1,9 +1,10 @@
 <div *ngIf="state !== undefined && currentMap !== undefined" class="edit-wrap">
     <div class="top">
         <h1>{{currentMap.getTitle()}}</h1>
-        <app-horizontal-trail [currentPath]="state[state.length-1][0]"></app-horizontal-trail>
+        <app-horizontal-trail [curState]="state[state.length-1]"></app-horizontal-trail>
         <fa-icon [icon]="faImage" (click)="selectedIcon === ICON_SELECTED.IMAGE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.IMAGE"></fa-icon>
         <input *ngIf="selectedIcon === ICON_SELECTED.IMAGE" type="file" (change)="view.addImage($event); selectedIcon = ICON_SELECTED.NONE;">
+        <fa-icon [icon]="faShapes" (click)="selectedIcon === ICON_SELECTED.SHAPES ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.SHAPES"></fa-icon>
         <!--
         <button (click)="view.addShape('square')">Square</button>
         <button (click)="view.addShape('circle')">Circle</button>

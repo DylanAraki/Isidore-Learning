@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Path } from '../content';
+import { Landmark, Path } from '../content';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ContentService } from '../content.service';
 
 @Component({
   selector: 'app-horizontal-trail',
@@ -8,15 +10,27 @@ import { Path } from '../content';
 })
 export class HorizontalTrailComponent implements OnInit {
 
-  @Input() currentPath!: Path;
+  @Input() curState!: [Path, Landmark];
 
-  constructor() { }
+  constructor(private contentManager: ContentService) { }
 
   ngOnInit(): void {
   }
 
   protected addLandmark(start: boolean) {
-    console.log(start);
+    this.contentManager.createLandmark(start ? -100 : 100, this.curState[0].getId(), start ? this.curState[0].getFirstLandmark() : this.curState[0].getLastLandmark())
+    .subscribe((resp) => {
+      if(start) {
+        this.curState[0].addToFrontOfLandmarks(new Landmark(resp));
+      }
+      else {
+        this.curState[0].addToBackOfLandmarks(new Landmark(resp));
+      }
+    })
   }
-
+  protected changeSlide(landmark: Landmark) {
+    if(landmark !== this.curState[1]) {
+      this.curState[1] = landmark;
+    }
+  }
 }

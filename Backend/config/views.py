@@ -6,6 +6,7 @@ from .models import ImageBox, Map, Path, Landmark
 from .serializers import ImageBoxSerializer, ImageUpdateSerializer, MapSerializer, PathSerializer, LandmarkSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.generics import get_object_or_404
 from rest_framework import status
 from base64 import decodebytes
 from datetime import datetime, timezone
@@ -38,7 +39,7 @@ def createMap(request): #Will also create a path and a landmark
 
             #Create the first landmark
             pathSerializer.save()
-            landmarkSerializer = LandmarkSerializer(data = {"pathId": pathSerializer.data["id"], "previousLandmark": None, "numAnimations": 1})
+            landmarkSerializer = LandmarkSerializer(data = {"pathId": pathSerializer.data["id"], "order": 0, "numAnimations": 1})
             if landmarkSerializer.is_valid():
                 landmarkSerializer.save()
                 #Return the response of all the unique IDs (default values will be assigned by client)
@@ -80,6 +81,15 @@ def getMainPath(request, id):
     pathSerializer = PathSerializer(path)
     return Response(pathSerializer.data, status=status.HTTP_200_OK)
 
+
+@api_view(['POST'])
+def createLandmark(request):
+    print(request.data)
+    serializer = LandmarkSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def createImage(request):

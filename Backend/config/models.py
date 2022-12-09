@@ -31,8 +31,12 @@ class Path(models.Model):
 
 class Landmark(models.Model):
     pathId = models.ForeignKey(Path, on_delete=models.CASCADE, related_name='landmarks')
-    previousLandmark = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    #previousLandmark = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    order = models.IntegerField()
     numAnimations = models.SmallIntegerField(default=1)
+
+    class Meta:
+        ordering = ['order']
 
 class ImageBox(models.Model):
     landmarkId = models.ForeignKey(Landmark, on_delete=models.CASCADE, related_name="images")

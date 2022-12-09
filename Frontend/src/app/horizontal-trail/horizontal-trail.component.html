@@ -1,14 +1,10 @@
 <div id="horizontal-trail-wrap">
     <button class="add-landmark-btn" (click)="addLandmark(true)">+</button>
-    <div *ngFor="let landmark of currentPath.getLandmarks(); let i = index" class="landmark-entry">
+    <div *ngFor="let landmark of curState[0].getLandmarks(); let i = index" class="landmark-entry">
         {{i+1}}
-        <div class="landmark-image">
+        <div [id]="curState[1]===landmark ? 'selected-landmark' : ''" class="landmark-image" (click)="changeSlide(landmark)">
             <app-view [editMode]="false" [currentLandmark]="landmark"></app-view>
         </div>
-        
-        <!-- <svg class="landmark-image" viewBox="0, 0, 1920, 1080">
-            
-        </svg> -->
     </div>
     <button class="add-landmark-btn" (click)="addLandmark(false)">+</button>
 </div>

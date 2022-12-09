@@ -21,6 +21,9 @@
     height: 72px;
     border: 2px solid;
 } 
+#selected-landmark {
+    border: 2px solid blue;
+}
 .add-landmark-btn {
     height: 50px;
     width: 50px;

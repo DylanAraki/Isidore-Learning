@@ -16,6 +16,8 @@ import { LegendComponent } from './legend/legend.component';
 import { VerticalTrailComponent } from './vertical-trail/vertical-trail.component';
 import { HorizontalTrailComponent } from './horizontal-trail/horizontal-trail.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+//import { DragDropModule } from '@angular/cdk/drag-drop';
+
 
 @NgModule({
   declarations: [

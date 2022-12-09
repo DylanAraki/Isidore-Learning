@@ -5,7 +5,7 @@ import { ContentService } from '../content.service';
 import { LineOptionsComponent } from '../line-options/line-options.component';
 import { Map, Path, Landmark } from '../content';
 import { AuthenticationService } from '../authentication.service';
-import { faImage } from '@fortawesome/free-solid-svg-icons';
+import { faImage, faShapes } from '@fortawesome/free-solid-svg-icons';
 import { ICON_SELECTED } from '../enums';
 
 
@@ -35,6 +35,7 @@ export class EditComponent implements OnInit {
 
   protected selectedIcon: ICON_SELECTED = ICON_SELECTED.NONE;
   protected faImage = faImage;
+  protected faShapes = faShapes;
 
   protected currentMap!: Map
   protected state!: [Path, Landmark][];
