@@ -51,12 +51,44 @@ export class ViewComponent implements OnInit {
       //this.draggable = subjx('#' + this.newId).drag();
       if (this.newId[0] === 'i') {
         //this.draggable['model'] = this.currentLandmark.imageContent[this.newId];
-        this.createImageDraggable(this.newId);
+        this.createImageOrShapeDraggable(this.newId, this.currentLandmark.imageContent[this.newId]);
+      }
+      else if(this.newId[0] === 's') {
+        this.createImageOrShapeDraggable(this.newId, this.currentLandmark.shapeContent[this.newId]);
       }
       this.newId = null;
     }
   }
+  ngOnChanges(): void {
+    //Called during a change in the current landmark
+    if (this.draggable !== null) {
+      this.destroyDraggable();
+    }
+  }
+  public addShape(shape: string) {
+    //Generate the 'd' value to create an SVG path
+    let newPath: string;
+    if (shape === 'square') {
+      newPath = generateSquarePath(this.landmarkPosition.x, this.landmarkPosition.y);
+    }
+    else if (shape === 'circle') {
+      newPath = generateCirclePath(this.landmarkPosition.x, this.landmarkPosition.y);
+    }
+    else if (shape === 'triangle') {
+      newPath = generateTrianglePath(this.landmarkPosition.x, this.landmarkPosition.y);
+    }
+    else {
+      return;
+    }
 
+    //Create a ShapeBox object to push to the DOM
+    this.contentManager.createShape(this.currentLandmark.getId(), newPath)
+      .subscribe((resp: any) => {
+        const shapeObj = new ShapeBox({ 'id': resp.id, 'd': resp.d, 'transformation': [1, 0, 0, 1, 0, 0] })
+        this.currentLandmark.shapeContent[shapeObj.id] = shapeObj;
+        this.newId = shapeObj.id;
+      });
+  }
   public addImage(event: any) {
     //Get the uploaded file
     const imgFile = event.target.files[0];
@@ -90,13 +122,25 @@ export class ViewComponent implements OnInit {
         if (event.target.classList.contains('image-content')) {
           if (this.draggable === null) {
             //Make new draggable
-            this.createImageDraggable(event.target.id);
+            this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.imageContent[event.target.id]);
           }
           else if (event.target.id !== this.draggable['model'].id) {
             //Destroy existing draggable
             this.destroyDraggable();
             //Make new draggable
-            this.createImageDraggable(event.target.id);
+            this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.imageContent[event.target.id]);
+          }
+        }
+        else if(event.target.classList.contains('shape-content')) {
+          if (this.draggable === null) {
+            //Make new draggable
+            this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.shapeContent[event.target.id]);
+          }
+          else if (event.target.id !== this.draggable['model'].id) {
+            //Destroy existing draggable
+            this.destroyDraggable();
+            //Make new draggable
+            this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.shapeContent[event.target.id]);
           }
         }
       }
@@ -111,19 +155,22 @@ export class ViewComponent implements OnInit {
     }
   }
   private destroyDraggable() {
-    this.draggable['model'].updateContent(this.draggable.elements[0]);
-    this.contentManager.updateContent(this.draggable['model'])
-      .subscribe((resp) => {
-        console.log(resp);
-      })
-    this.draggable.disable();
-    this.draggable = null;
+    if (this.draggable !== null) {
+      this.draggable['model'].updateContent(this.draggable.elements[0]);
+      this.contentManager.updateContent(this.draggable['model'])
+        .subscribe((resp) => {
+          console.log(resp);
+        })
+      this.draggable.disable();
+      this.draggable = null;
+    }
   }
-  private createImageDraggable(id: string) {
+  private createImageOrShapeDraggable(id: string, model: any) {
     //Create the subjx instance
     this.draggable = subjx('#' + id).drag();
 
-    this.draggable['model'] = this.currentLandmark.imageContent[id]; //Maintain a reference to the original object
+    //this.draggable['model'] = this.currentLandmark.imageContent[id]; //Maintain a reference to the original object
+    this.draggable['model'] = model;
     this.draggable['options']['proportions'] = true; //By default, preserve the aspect ratio
     this.draggable['options']['scalable'] = true; //Image will fit to the box
 
@@ -144,6 +191,8 @@ export class ViewComponent implements OnInit {
     //Reset the defaults
     this.draggable.on('resizeEnd', () => { this.draggable['options']['proportions'] = true; })
   }
+
+
 
 
 

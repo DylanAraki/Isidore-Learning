@@ -1,7 +1,7 @@
 export class Changes {
-    deletions: {[id: number | string]: any} = {};
-    creations: {[id: number | string]: any} = {};
-    updates: {[id: number | string]: [any, string[]]} = {};
+    deletions: { [id: number | string]: any } = {};
+    creations: { [id: number | string]: any } = {};
+    updates: { [id: number | string]: [any, string[]] } = {};
 }
 
 
@@ -17,22 +17,22 @@ export class Map {
     private topic: string | null = null;
     private lastSaved: Date;
 
-    constructor(mapResponse: {[key: string]: any}) { 
+    constructor(mapResponse: { [key: string]: any }) {
         this.id = mapResponse['id'];
         this.owner = mapResponse['owner'];
-        if("title" in mapResponse) {
+        if ("title" in mapResponse) {
             this.title = mapResponse['title'];
         }
-        if("publicity" in mapResponse) {
+        if ("publicity" in mapResponse) {
             this.publicity = mapResponse['publicity'];
         }
-        if("tags" in mapResponse) {
+        if ("tags" in mapResponse) {
             this.tags = mapResponse['tags'];
         }
-        if("description" in mapResponse) {
+        if ("description" in mapResponse) {
             this.description = mapResponse['description'];
         }
-        if("topic" in mapResponse) {
+        if ("topic" in mapResponse) {
             this.topic = mapResponse['topic'];
         }
         this.lastSaved = new Date(mapResponse['lastSaved']);
@@ -46,13 +46,13 @@ export class Path {
     private isMainPath: boolean;
     private landmarks: Landmark[] = [];
 
-    constructor(pathResponse: {[key:string ]: any}) {
+    constructor(pathResponse: { [key: string]: any }) {
         this.id = pathResponse['id'];
         this.mapId = pathResponse['mapId'];
         this.isMainPath = pathResponse['isMainPath'];
 
         //Server guarantees the landmarks are passed in the correct order
-        for(let landmarkResponse of pathResponse['landmarks']) {
+        for (let landmarkResponse of pathResponse['landmarks']) {
             this.landmarks.push(new Landmark(landmarkResponse));
         }
     }
@@ -76,21 +76,25 @@ export class Landmark {
     //private textContent: {[key:string]: TextBox} = {};
     //private shapeContent: {[key:string]: ShapeBox} = {};
     //public imageContent: {[key:string]: ImageBox} = {};
-    
-    //public imageContent: ImageBox[] = [];
-    public imageContent: {[id: string]: ImageBox} = {};
 
-    constructor(landmarkResponse: {[key:string]: any}) {
+    //public imageContent: ImageBox[] = [];
+    public imageContent: { [id: string]: ImageBox } = {};
+    public shapeContent: { [id: string]: ShapeBox } = {};
+
+    constructor(landmarkResponse: { [key: string]: any }) {
         this.id = landmarkResponse['id'];
         this.order = landmarkResponse['order'];
-        for(let imageResponse of landmarkResponse['images']) {
+        for (let imageResponse of landmarkResponse['images']) {
             //this.imageContent.push(new ImageBox(imageResponse));
             this.imageContent['i' + imageResponse['id']] = new ImageBox(imageResponse);
+        }
+        for(let shapeResponse of landmarkResponse['shapes']) {
+            this.shapeContent['s' + shapeResponse['id']] = new ShapeBox(shapeResponse);
         }
     }
     public getId(): number { return this.id; }
     public getOrder(): number { return this.order; }
-    public setOrder(newOrder: number) { this.order = newOrder;  }
+    public setOrder(newOrder: number) { this.order = newOrder; }
     //public addImage(newImage: ImageBox): void { this.imageContent[newImage.getId()] = newImage; }
 }
 export class ImageBox {
@@ -104,16 +108,7 @@ export class ImageBox {
     //saved: boolean;
     image: string;
 
-    constructor(imageResponse: {[key: string]: any}) {
-        /* this.saved = saved;
-        if(this.saved) {
-            this.id = 'io' + imageResponse['id'].toString();
-            this.src = "http://localhost:8000/images/" + imageResponse['id'].toString() + '/';            
-        }
-        else {
-            this.id = 'in' + imageResponse['id'].toString();
-            this.src = imageResponse['src'];
-        } */
+    constructor(imageResponse: { [key: string]: any }) {
         this.id = 'i' + imageResponse['id'].toString();
         this.landmarkId = imageResponse['landmarkId'];
         this.x = imageResponse['x'];
@@ -144,12 +139,35 @@ export class ImageBox {
         };
     }
 }
+export class ShapeBox {
+    id: string; //Displayed on CSS
+    landmarkId: number;
+    transformation: DOMMatrix;
+    d: string;
+    constructor(shapeResponse: { [key: string]: any }) {
+        this.id = 's' + shapeResponse['id'].toString();
+        this.landmarkId = shapeResponse['landmarkId'];
+        this.transformation = new DOMMatrix(shapeResponse['transformation']);
+        this.d = shapeResponse['d'];
+
+
+        console.log(this);
+    }
+    public updateContent(element: any) {
+        this.d = element.getAttribute('d');
+        this.transformation = new DOMMatrix(element.getAttribute('transform'));
+    }
+    public formatHttp() {
+        return {
+            'd': this.d,
+            'transformation': [this.transformation.a, this.transformation.b, this.transformation.c, this.transformation.d, this.transformation.e, this.transformation.f]
+        };
+    }
+}
 export class TextBox {
 
 }
-export class ShapeBox {
 
-}
 
 
 
@@ -258,154 +276,154 @@ export class Landmark {
     public addImageContent(box: ImageBox) {
         this.imageContent.push(box);
     }*/
-    /*
-    public getContent() {
-        return this.content;
-    }
-    public addContent(newContent: ContentBox) {
-        this.content[newContent.cssId] = newContent;
-    }
+/*
+public getContent() {
+    return this.content;
+}
+public addContent(newContent: ContentBox) {
+    this.content[newContent.cssId] = newContent;
+}
 }
 
 
 //TODO: These implementations are a mess. 
 export interface ContentBox {
-    readonly id: number;
-    readonly landmarkId: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    transformation: DOMMatrix;
-    saved: boolean;
-    cssId: string;
-    content: any[];
+readonly id: number;
+readonly landmarkId: number;
+x: number;
+y: number;
+width: number;
+height: number;
+transformation: DOMMatrix;
+saved: boolean;
+cssId: string;
+content: any[];
 
-    move(newX: number, newY: number): void;
-    resize(newWidth: number, newHeight: number): void;
-    setTransformation(newTransformation: SVGMatrix): void;
+move(newX: number, newY: number): void;
+resize(newWidth: number, newHeight: number): void;
+setTransformation(newTransformation: SVGMatrix): void;
 }
 
 export class ImageBox implements ContentBox {
-    id: number;
-    landmarkId: number;
-    x: number;
-    y: number;
-    saved: boolean;
-    width: number;
-    height: number;
-    transformation: DOMMatrix;
-    cssId: string
-    src: string; //The source of the image. Will either be locally saved or from the server
-    content: any[] = [];
-    
-    constructor(imageResponse: {[id: string]: string}, saved: boolean) {
-        this.id = +imageResponse['id'];
-        this.landmarkId = +imageResponse['landmarkId'];
-        this.x = +imageResponse['x'];
-        this.y = +imageResponse['y'];
-        this.width = +imageResponse['width'];
-        this.height = +imageResponse['height'];
-        this.src = imageResponse['src'];
-        this.content.push(imageResponse['src']); //TODO: Temp
-        this.cssId = "img" + imageResponse['id'];
-        this.saved = saved;
+id: number;
+landmarkId: number;
+x: number;
+y: number;
+saved: boolean;
+width: number;
+height: number;
+transformation: DOMMatrix;
+cssId: string
+src: string; //The source of the image. Will either be locally saved or from the server
+content: any[] = [];
+ 
+constructor(imageResponse: {[id: string]: string}, saved: boolean) {
+    this.id = +imageResponse['id'];
+    this.landmarkId = +imageResponse['landmarkId'];
+    this.x = +imageResponse['x'];
+    this.y = +imageResponse['y'];
+    this.width = +imageResponse['width'];
+    this.height = +imageResponse['height'];
+    this.src = imageResponse['src'];
+    this.content.push(imageResponse['src']); //TODO: Temp
+    this.cssId = "img" + imageResponse['id'];
+    this.saved = saved;
 
-        this.transformation = new DOMMatrix([1,0,0,1,0,0]);
-    }
+    this.transformation = new DOMMatrix([1,0,0,1,0,0]);
+}
 
-    public move(newX: number, newY: number) {
-        this.x = newX;
-        this.y = newY;
-    }
-    public resize(newWidth: number, newHeight: number) {
-        this.width = newWidth;
-        this.height = newHeight;
-    }
-    public setTransformation(newTransformation: SVGMatrix) {
-        this.transformation = new DOMMatrix([newTransformation.a, newTransformation.b, newTransformation.c, newTransformation.d, newTransformation.e, newTransformation.f]);
-    }
+public move(newX: number, newY: number) {
+    this.x = newX;
+    this.y = newY;
+}
+public resize(newWidth: number, newHeight: number) {
+    this.width = newWidth;
+    this.height = newHeight;
+}
+public setTransformation(newTransformation: SVGMatrix) {
+    this.transformation = new DOMMatrix([newTransformation.a, newTransformation.b, newTransformation.c, newTransformation.d, newTransformation.e, newTransformation.f]);
+}
 }
 
 export class ShapeBox implements ContentBox {
-    id: number;
-    landmarkId: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    transformation: DOMMatrix;
-    saved: boolean;
-    cssId: string;
-    content: any[] = [];
-    constructor(shapeResponse: {[id: string]: any}, saved: boolean) {
-        this.id = +shapeResponse['id'];
-        this.landmarkId = +shapeResponse['landmarkId'];
-        this.x = +shapeResponse['x'];
-        this.y = +shapeResponse['y'];
-        this.width = +shapeResponse['width'];
-        this.height = +shapeResponse['height'];
+id: number;
+landmarkId: number;
+x: number;
+y: number;
+width: number;
+height: number;
+transformation: DOMMatrix;
+saved: boolean;
+cssId: string;
+content: any[] = [];
+constructor(shapeResponse: {[id: string]: any}, saved: boolean) {
+    this.id = +shapeResponse['id'];
+    this.landmarkId = +shapeResponse['landmarkId'];
+    this.x = +shapeResponse['x'];
+    this.y = +shapeResponse['y'];
+    this.width = +shapeResponse['width'];
+    this.height = +shapeResponse['height'];
 
-        this.transformation = new DOMMatrix([1,0,0,1,0,0]);
+    this.transformation = new DOMMatrix([1,0,0,1,0,0]);
 
-        this.saved = saved;
-        this.cssId = "shape" + shapeResponse['id'];
-        this.content.push(shapeResponse['content']);
+    this.saved = saved;
+    this.cssId = "shape" + shapeResponse['id'];
+    this.content.push(shapeResponse['content']);
 
-    }
-    public move(newX: number, newY: number) {
-        this.x = newX;
-        this.y = newY;
-    }
-    public resize(newWidth: number, newHeight: number) {
-        this.width = newWidth;
-        this.height = newHeight;
-    }
-    public setTransformation(newTransformation: SVGMatrix) {
-        this.transformation = new DOMMatrix([newTransformation.a, newTransformation.b, newTransformation.c, newTransformation.d, newTransformation.e, newTransformation.f]);
-    }   
+}
+public move(newX: number, newY: number) {
+    this.x = newX;
+    this.y = newY;
+}
+public resize(newWidth: number, newHeight: number) {
+    this.width = newWidth;
+    this.height = newHeight;
+}
+public setTransformation(newTransformation: SVGMatrix) {
+    this.transformation = new DOMMatrix([newTransformation.a, newTransformation.b, newTransformation.c, newTransformation.d, newTransformation.e, newTransformation.f]);
+}   
 }
 export class TextBox implements ContentBox {
-    id: number;
-    landmarkId: number;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    transformation: DOMMatrix;
-    saved: boolean;
-    cssId: string;
-    content: any[] = [];
-    constructor(textResponse: {[id: string]: any}, saved: boolean) {
-        this.id = +textResponse['id'];
-        this.landmarkId = +textResponse['landmarkId'];
-        this.x = +textResponse['x'];
-        this.y = +textResponse['y'];
-        this.width = +textResponse['width'];
-        this.height = +textResponse['height'];
-        this.content = textResponse['content'];
-        this.cssId = "txt" + textResponse['id'];
-        this.saved = saved;
+id: number;
+landmarkId: number;
+x: number;
+y: number;
+width: number;
+height: number;
+transformation: DOMMatrix;
+saved: boolean;
+cssId: string;
+content: any[] = [];
+constructor(textResponse: {[id: string]: any}, saved: boolean) {
+    this.id = +textResponse['id'];
+    this.landmarkId = +textResponse['landmarkId'];
+    this.x = +textResponse['x'];
+    this.y = +textResponse['y'];
+    this.width = +textResponse['width'];
+    this.height = +textResponse['height'];
+    this.content = textResponse['content'];
+    this.cssId = "txt" + textResponse['id'];
+    this.saved = saved;
 
-        this.transformation = new DOMMatrix([1,0,0,1,0,0]);
-    }
+    this.transformation = new DOMMatrix([1,0,0,1,0,0]);
+}
 
-    public move(newX: number, newY: number) {
-        this.x = newX;
-        this.y = newY;
-    }
-    public resize(newWidth: number, newHeight: number) {
-        this.width = newWidth;
-        this.height = newHeight;
-    }
-    public setTransformation(newTransformation: SVGMatrix) {
-        this.transformation = new DOMMatrix([newTransformation.a, newTransformation.b, newTransformation.c, newTransformation.d, newTransformation.e, newTransformation.f]);
-    } 
-    public getTextSpans(): string[] {
-        return this.content;
-    }
-    public getHeight(): number {
-        return this.height;
-    }
+public move(newX: number, newY: number) {
+    this.x = newX;
+    this.y = newY;
+}
+public resize(newWidth: number, newHeight: number) {
+    this.width = newWidth;
+    this.height = newHeight;
+}
+public setTransformation(newTransformation: SVGMatrix) {
+    this.transformation = new DOMMatrix([newTransformation.a, newTransformation.b, newTransformation.c, newTransformation.d, newTransformation.e, newTransformation.f]);
+} 
+public getTextSpans(): string[] {
+    return this.content;
+}
+public getHeight(): number {
+    return this.height;
+}
 }
 */

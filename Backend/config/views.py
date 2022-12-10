@@ -2,14 +2,15 @@ import base64
 import json
 from django import forms
 from django.http import JsonResponse
-from .models import ImageBox, Map, Path, Landmark
-from .serializers import ImageBoxSerializer, ImageUpdateSerializer, MapSerializer, PathSerializer, LandmarkSerializer
+from .models import ImageBox, Map, Path, Landmark, ShapeBox
+from .serializers import ImageBoxSerializer, MapSerializer, PathSerializer, LandmarkSerializer, ShapeBoxSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.generics import get_object_or_404
 from rest_framework import status
 from base64 import decodebytes
 from datetime import datetime, timezone
+import re
 
 
 import uuid
@@ -92,6 +93,16 @@ def createLandmark(request):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
+def createShape(request):
+    print(request.data['d'])
+    serializer = ShapeBoxSerializer(data=request.data, context={'request': request})
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
 def createImage(request):
     imageFile = request.FILES.get('image')
     #TODO: Add file type verification
@@ -109,7 +120,10 @@ def updateImage(request, id):
     #TODO: Add error checking
     ImageBox.objects.filter(id = id).update(x = request.data['x'], y = request.data['y'], width = request.data['width'], height = request.data['height'], transformation = request.data['transformation'])
     return Response(status=status.HTTP_200_OK)
-
+@api_view(['PUT'])
+def updateShape(request, id):
+    ShapeBox.objects.filter(id = id).update(d = request.data['d'], transformation = request.data['transformation'])
+    return Response(status=status.HTTP_200_OK)
 
 @api_view(['PUT'])
 def updateLandmarkOrder(request, id):

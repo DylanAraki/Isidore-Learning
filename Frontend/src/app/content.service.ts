@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, Observable } from 'rxjs';
-import { Changes, ImageBox, Landmark, Map, Path } from './content'
+import { Changes, ImageBox, Landmark, Map, Path, ShapeBox } from './content'
 
 @Injectable({
   providedIn: 'root'
@@ -63,7 +63,25 @@ export class ContentService {
     uploadData.append("image", image);
     return this.http.post(this.url + 'create-image/', uploadData);
   }
+  public createShape(landmarkId: number, d: string) {
+    //Identifies all numbers with more than two numbers after the decimal place
+    const longNumbers = d.match(/\s*\d+\.\d{3,}\s*/g);
+
+  if (longNumbers) {
+    // Iterate over the numbers and truncate each one to two decimal places.
+    for (const number of longNumbers) {
+      // Convert the number to a float and truncate it to two decimal places.
+      const truncated = parseFloat(number).toFixed(2);
+      // Replace the original number in the input string with the truncated version.
+      d = d.replace(number, `${truncated} `);
+    }
+  }
+    return this.http.post(this.url + 'create-shape/', {'landmarkId': landmarkId, 'd': d});
+  }
   //HTTP PUT REQUESTS
+  private updateShapeBox(shapeBox: ShapeBox) {
+    return this.http.put(this.url + 'shape-boxes/' + shapeBox.id.slice(1) + '/', shapeBox.formatHttp());
+  }
   private updateImageBox(imageBox: ImageBox) {
     return this.http.put(this.url + 'image-boxes/' + imageBox.id.slice(1) + '/', imageBox.formatHttp());
   }
@@ -74,6 +92,9 @@ export class ContentService {
   public updateContent(box: any) {
     if(box.id[0] == 'i') {
       return this.updateImageBox(box);
+    }
+    else if(box.id[0] == 's') {
+      return this.updateShapeBox(box);
     }
     return this.updateImageBox(box); //TODO: TEMP
   }

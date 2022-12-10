@@ -5,6 +5,17 @@
         <fa-icon [icon]="faImage" (click)="selectedIcon === ICON_SELECTED.IMAGE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.IMAGE"></fa-icon>
         <input *ngIf="selectedIcon === ICON_SELECTED.IMAGE" type="file" (change)="view.addImage($event); selectedIcon = ICON_SELECTED.NONE;">
         <fa-icon [icon]="faShapes" (click)="selectedIcon === ICON_SELECTED.SHAPES ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.SHAPES"></fa-icon>
+        <div *ngIf="selectedIcon === ICON_SELECTED.SHAPES" id="shape-wrapper">
+            <svg class="shape-display" viewBox="0, 0, 10, 10" (click)="view.addShape('square')">
+                <rect x="1" y="1" width="9" height="9"></rect>
+            </svg>
+            <svg class="shape-display" viewBox="0, 0, 10, 10" (click)="view.addShape('triangle')">
+                <polygon points="5,1.34 10,10, 0,10"></polygon>
+            </svg>
+            <svg class="shape-display" viewBox="0, 0, 10, 10" (click)="view.addShape('circle')">
+                <circle cx="5.5" cy="5.5" r="4.5"></circle>
+            </svg>
+        </div>
         <!--
         <button (click)="view.addShape('square')">Square</button>
         <button (click)="view.addShape('circle')">Circle</button>

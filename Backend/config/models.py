@@ -48,6 +48,11 @@ class ImageBox(models.Model):
     transformation = ArrayField(models.FloatField(), size=6, default=defaultTransformation)
     animationAppearance = models.SmallIntegerField(default=0)
 
+class ShapeBox(models.Model):
+    landmarkId = models.ForeignKey(Landmark, on_delete=models.CASCADE, related_name="shapes")
+    d = models.CharField(max_length=500) #May need to play with this number. It's over the top, but for now, a simple string is sufficient.
+    transformation = ArrayField(models.FloatField(), size=6, default=defaultTransformation)
+    animationAppearance = models.SmallIntegerField(default=0)
  
 
 """

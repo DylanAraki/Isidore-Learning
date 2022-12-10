@@ -48,6 +48,17 @@ app-view {
 }
 
 
+#shape-wrapper {
+    height: 50px;
+    display: flex;
+    gap: 5px;
+}
+.shape-display {
+    height: 100%;
+    aspect-ratio: 1;
+}
+
+
 
 
 /*.edit-wrap {

@@ -3,6 +3,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatOptionModule } from '@angular/material/core';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -18,6 +22,7 @@ import { HorizontalTrailComponent } from './horizontal-trail/horizontal-trail.co
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+
 
 
 
@@ -43,7 +48,11 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     HttpClientModule,
     FontAwesomeModule,
     BrowserAnimationsModule,
-    DragDropModule
+    DragDropModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatOptionModule
   ],
   providers: [],
   bootstrap: [AppComponent]
