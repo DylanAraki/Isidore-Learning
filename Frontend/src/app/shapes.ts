@@ -32,3 +32,6 @@ export function generateParallelogram(x: number, y: number) {
     + ' l ' + (-DEFAULT_RADIUS/2).toString() + ' ' + (2*DEFAULT_RADIUS).toString()
     + ' z';   
 }
+export function createLine(x1: number, y1: number, x2: number, y2: number) {
+    return 'M' + x1.toString() + ' ' + y1.toString() + ' L ' + x2.toString() + ' ' + y2.toString();
+}

@@ -1,8 +1,16 @@
-<svg class="landmark-display" [id]="editMode ? 'editable-landmark' : ''" viewBox="0, 0, 1920, 1080" (click)="clickLandmark($event)">
+<svg [class.line-add]="lineAdd !== LINE_ADD.NONE" [class.landmark-display]="true"  [id]="editMode ? 'editable-landmark' : ''" viewBox="0, 0, 1920, 1080" (click)="clickLandmark($event)">
+    <g *ngIf="lineAdd !== LINE_ADD.NONE">
+        <rect *ngIf="lineAdd === LINE_ADD.DRAW_POINT" x="0" y="0" width="1920" height="1080" fill="transparent" (mousedown)="startLine($event)"></rect>
+        <g *ngIf="lineAdd === LINE_ADD.DRAW_LINE" (mousemove)="drawLine($event)" (mouseup)="endLine($event)" (click)="endLine($event)">
+            <rect x="0" y="0" width="1920" height="1080" fill="transparent"></rect>
+            <line id="new-line" [attr.x1]="tempLine![0]" [attr.y1]="tempLine![1]" [attr.x2]="tempLine![2]" [attr.y2]="tempLine![3]" stroke="black" stroke-width="1px" opacity="0.5"></line>
+        </g>
+    </g>
+
     <image *ngFor="let imageBox of currentLandmark.imageContent | keyvalue" class="image-content" [id]="editMode ? imageBox.key : ''" [attr.href]="imageBox.value.image"
     [attr.x]="imageBox.value.x" [attr.y]="imageBox.value.y" [attr.width]="imageBox.value.width" [attr.height]="imageBox.value.height" [attr.transform]="imageBox.value.transformation">
     </image>
-    <path *ngFor="let shapeBox of currentLandmark.shapeContent | keyvalue" class="shape-content" [id]="editMode ? shapeBox.key : ''" [attr.d]="shapeBox.value.d" [attr.transform]="shapeBox.value.transformation"></path>
+    <path *ngFor="let shapeBox of currentLandmark.shapeContent | keyvalue" class="shape-content" [id]="editMode ? shapeBox.key : ''" [attr.d]="shapeBox.value.d" [attr.transform]="shapeBox.value.transformation" stroke="black" stroke-width="1px"></path>
 </svg>
 
 

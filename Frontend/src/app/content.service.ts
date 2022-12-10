@@ -8,14 +8,14 @@ import { Changes, ImageBox, Landmark, Map, Path, ShapeBox } from './content'
 })
 export class ContentService {
 
-  private maps: {[id: number]: Map} = {};
-  private mainPaths: {[id: number]: Path} = {};
+  private maps: { [id: number]: Map } = {};
+  private mainPaths: { [id: number]: Path } = {};
   private url = "http://localhost:8000/"; //TODO: Temporary (move to environments)
   //private changes = [[Object, TYPE][], [Object, TYPE][], [Object, TYPE, Object[][]]]  = [[], [], []];
   //private changes: Changes;
 
 
-  constructor(private http: HttpClient) { 
+  constructor(private http: HttpClient) {
     //this.changes = new Changes(); //TODO: Note that to update last saved on map, there will need to be something done about this
   }
 
@@ -34,10 +34,10 @@ export class ContentService {
     this.changes.creations[createdObject.getId()] = createdObject;
   } */
   //CREATING LOCAL TYPESCRIPT OBJECTS
-  public addMapToDictionary(mapResponse: {[id: string]: any}): void {
+  public addMapToDictionary(mapResponse: { [id: string]: any }): void {
     this.maps[mapResponse['id']] = new Map(mapResponse);
   }
-  public addMainPathToDictionary(pathResponse: {[id: string]: any}): void {
+  public addMainPathToDictionary(pathResponse: { [id: string]: any }): void {
     this.mainPaths[pathResponse['mapId']] = new Path(pathResponse);
   }
   //HTTP POST REQUESTS
@@ -47,11 +47,11 @@ export class ContentService {
     })
   }
   public createLandmark(offset: number, pathId: number, adjacentLandmark: Landmark): Observable<any> {
-    return this.http.post(this.url + 'landmark/', 
-    {
-      'pathId': pathId,
-      'order': adjacentLandmark.getOrder() + offset
-    });
+    return this.http.post(this.url + 'landmark/',
+      {
+        'pathId': pathId,
+        'order': adjacentLandmark.getOrder() + offset
+      });
   }
   public createImageBox(landmarkId: number, x: number, y: number, width: number, height: number, transformation: number[], image: File): Observable<any> {
     const uploadData = new FormData();
@@ -64,19 +64,24 @@ export class ContentService {
     return this.http.post(this.url + 'create-image/', uploadData);
   }
   public createShape(landmarkId: number, d: string) {
+
+    console.log(landmarkId);
+    console.log(d);
+
     //Identifies all numbers with more than two numbers after the decimal place
     const longNumbers = d.match(/\s*\d+\.\d{3,}\s*/g);
 
-  if (longNumbers) {
-    // Iterate over the numbers and truncate each one to two decimal places.
-    for (const number of longNumbers) {
-      // Convert the number to a float and truncate it to two decimal places.
-      const truncated = parseFloat(number).toFixed(2);
-      // Replace the original number in the input string with the truncated version.
-      d = d.replace(number, `${truncated} `);
+    if (longNumbers) {
+      // Iterate over the numbers and truncate each one to two decimal places.
+      for (const number of longNumbers) {
+        // Convert the number to a float and truncate it to two decimal places.
+        const truncated = parseFloat(number).toFixed(2);
+        // Replace the original number in the input string with the truncated version.
+        d = d.replace(number, `${truncated} `);
+      }
     }
-  }
-    return this.http.post(this.url + 'create-shape/', {'landmarkId': landmarkId, 'd': d});
+    console.log(d);
+    return this.http.post(this.url + 'create-shape/', { 'landmarkId': landmarkId, 'd': d });
   }
   //HTTP PUT REQUESTS
   private updateShapeBox(shapeBox: ShapeBox) {
@@ -86,14 +91,14 @@ export class ContentService {
     return this.http.put(this.url + 'image-boxes/' + imageBox.id.slice(1) + '/', imageBox.formatHttp());
   }
   public updateLandmarkOrder(id: number, newOrder: number): Observable<any> {
-    return this.http.put(this.url + 'landmark-order/' + id.toString() + '/', {'order': newOrder});
+    return this.http.put(this.url + 'landmark-order/' + id.toString() + '/', { 'order': newOrder });
   }
 
   public updateContent(box: any) {
-    if(box.id[0] == 'i') {
+    if (box.id[0] == 'i') {
       return this.updateImageBox(box);
     }
-    else if(box.id[0] == 's') {
+    else if (box.id[0] == 's') {
       return this.updateShapeBox(box);
     }
     return this.updateImageBox(box); //TODO: TEMP
@@ -101,7 +106,7 @@ export class ContentService {
 
   //HTTP OR LOCAL GET REQUESTS
   public checkMap(id: number): Map | null {
-    if(id in this.maps) {
+    if (id in this.maps) {
       return this.maps[id];
     }
     else {
@@ -109,7 +114,7 @@ export class ContentService {
     }
   }
   public checkMainPath(mapId: number): Path | null {
-    if(mapId in this.mainPaths) {
+    if (mapId in this.mainPaths) {
       return this.mainPaths[mapId];
     }
     else {
@@ -120,6 +125,6 @@ export class ContentService {
     return this.http.get(this.url + 'map/' + id + '/');
   }
   public getMainPath(mapId: number): Observable<any> {
-    return this.http.get(this.url + 'main-path/' + mapId + '/'); 
+    return this.http.get(this.url + 'main-path/' + mapId + '/');
   }
 }

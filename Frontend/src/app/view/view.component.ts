@@ -1,8 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ImageBox, Landmark, ShapeBox, TextBox } from '../content';
 import { ContentService } from '../content.service';
-import { generateSquarePath, DEFAULT_RADIUS, generateTrianglePath, generateCirclePath, generateRightTrianglePath, generateParallelogram } from '../shapes';
+import { generateSquarePath, DEFAULT_RADIUS, generateTrianglePath, generateCirclePath, generateRightTrianglePath, generateParallelogram, createLine } from '../shapes';
 import { ChangeDetectorRef } from '@angular/core';
+import { LINE_ADD } from '../enums';
+import { outputAst } from '@angular/compiler';
+//import subjx from '../../../node_modules/subjx/types';
+//import { Observable } from 'rxjs';
+
 
 const subjx = require('../../../node_modules/subjx/dist/js/subjx'); //TODO: Try to avoid this
 
@@ -23,13 +28,17 @@ export class ViewComponent implements OnInit {
   //protected textObserver: ResizeObserver;;
 
 
-
+  LINE_ADD = LINE_ADD;
   @Input() editMode: boolean = false;
   @Input() currentLandmark!: Landmark;
+  @Input() lineAdd: LINE_ADD = LINE_ADD.NONE;
+  @Output() lineAdded = new EventEmitter<LINE_ADD>();
+
   private landmarkDom: any; //Typecast better
   private landmarkPosition: any;
   private newId: string | null = null;
   protected draggable: any = null;
+  protected tempLine: [number, number, number, number] | null = null;
 
   constructor(private contentManager: ContentService) { }
   ngOnInit(): void {
@@ -53,7 +62,7 @@ export class ViewComponent implements OnInit {
         //this.draggable['model'] = this.currentLandmark.imageContent[this.newId];
         this.createImageOrShapeDraggable(this.newId, this.currentLandmark.imageContent[this.newId]);
       }
-      else if(this.newId[0] === 's') {
+      else if (this.newId[0] === 's') {
         this.createImageOrShapeDraggable(this.newId, this.currentLandmark.shapeContent[this.newId]);
       }
       this.newId = null;
@@ -84,7 +93,7 @@ export class ViewComponent implements OnInit {
     //Create a ShapeBox object to push to the DOM
     this.contentManager.createShape(this.currentLandmark.getId(), newPath)
       .subscribe((resp: any) => {
-        const shapeObj = new ShapeBox({ 'id': resp.id, 'd': resp.d, 'transformation': [1, 0, 0, 1, 0, 0] })
+        const shapeObj = new ShapeBox({ 'id': resp.id, 'landmarkId': resp.landmarkId, 'd': resp.d, 'transformation': [1, 0, 0, 1, 0, 0] })
         this.currentLandmark.shapeContent[shapeObj.id] = shapeObj;
         this.newId = shapeObj.id;
       });
@@ -116,6 +125,7 @@ export class ViewComponent implements OnInit {
     reader.readAsDataURL(imgFile);
   }
   protected clickLandmark(event: any) {
+    console.log("registered");
     if (this.editMode) {
       //This is slightly sketchy, I may admit. It may be better to create a temporary SVG point with the client values.
       if (event.target !== this.landmarkDom) {
@@ -131,7 +141,7 @@ export class ViewComponent implements OnInit {
             this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.imageContent[event.target.id]);
           }
         }
-        else if(event.target.classList.contains('shape-content')) {
+        else if (event.target.classList.contains('shape-content')) {
           if (this.draggable === null) {
             //Make new draggable
             this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.shapeContent[event.target.id]);
@@ -169,29 +179,75 @@ export class ViewComponent implements OnInit {
     //Create the subjx instance
     this.draggable = subjx('#' + id).drag();
 
-    //this.draggable['model'] = this.currentLandmark.imageContent[id]; //Maintain a reference to the original object
+    //TODO: Repeat this for all of them
+    this.draggable.storage.handles['bc'].setAttribute('r', '8');
+    //Maintain a reference to the model
     this.draggable['model'] = model;
-    this.draggable['options']['proportions'] = true; //By default, preserve the aspect ratio
-    this.draggable['options']['scalable'] = true; //Image will fit to the box
 
-    this.draggable.on('resizeStart', () => { this.draggable['aspectRatioSet'] = false; }); //Need to wait to see whether the resize comes from the sides or the corners
-    this.draggable.on('resize', (e: any) => {
-      if (!this.draggable['aspectRatioSet']) {
-        //If the resize event comes from the sides, do not maintain the aspect ratio
-        if (e.mouseEvent.path[0] === this.draggable.storage.handles['bc'] || e.mouseEvent.path[0] === this.draggable.storage.handles['tc'] || e.mouseEvent.path[0] === this.draggable.storage.handles['ml'] || e.mouseEvent.path[0] === this.draggable.storage.handles['mr']) {
-          this.draggable['options']['proportions'] = false;
-          this.draggable['aspectRatioSet'] = true;
-        }
-        //Otherwise, preserve the aspect ratio
-        else if (e.mouseEvent.path[0] === this.draggable.storage.handles['bl'] || e.mouseEvent.path[0] === this.draggable.storage.handles['tl'] || e.mouseEvent.path[0] === this.draggable.storage.handles['br'] || e.mouseEvent.path[0] === this.draggable.storage.handles['tr']) {
-          this.draggable['aspectRatioSet'] = true;
-        }
+    if (id[0] == 'i') {
+      this.draggable['options']['scalable'] = true; //Image will fit to the box (default is not to, which is desired for shapes)
+    }
+
+
+    //Check if the resize is from one of the corners (in which case the aspect ratio is preserved) or one of the edges (in which case it is not)
+    this.draggable.on('resizeStart', (event: any) => {
+      const source = document.elementFromPoint(event.clientX, event.clientY);
+      if (source === this.draggable.storage.handles['bc'] || source === this.draggable.storage.handles['tc'] || source === this.draggable.storage.handles['ml'] || source === this.draggable.storage.handles['mr']) {
+        this.draggable['options']['proportions'] = false;
       }
+      else {
+        this.draggable['options']['proportions'] = true;
+      }
+      console.log(source);
     });
-    //Reset the defaults
-    this.draggable.on('resizeEnd', () => { this.draggable['options']['proportions'] = true; })
   }
+  startLine(event: any) {
+    event.stopPropagation();
+    this.landmarkPosition.x = event.clientX;
+    this.landmarkPosition.y = event.clientY;
+    this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
+    this.tempLine = [this.landmarkPosition.x, this.landmarkPosition.y, this.landmarkPosition.x, this.landmarkPosition.y];
 
+    this.lineAdd = LINE_ADD.DRAW_LINE;
+  }
+  drawLine(event: any) {
+    event.stopPropagation();
+
+
+    console.log("Ack?")
+    this.landmarkPosition.x = event.clientX;
+    this.landmarkPosition.y = event.clientY;
+    this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
+    this.tempLine![2] = this.landmarkPosition.x;
+    this.tempLine![3] = this.landmarkPosition.y;
+  }
+  endLine(event: any) {
+    event.stopPropagation();
+
+    console.log("Hello?")
+
+    this.landmarkPosition.x = event.clientX;
+    this.landmarkPosition.y = event.clientY;
+    this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
+
+    const path = createLine(this.tempLine![0], this.tempLine![1], this.landmarkPosition.x, this.landmarkPosition.y);
+
+    //Add line
+    this.lineAdd = LINE_ADD.NONE;
+    this.tempLine = null;
+    this.lineAdded.emit();
+
+
+    //Create a ShapeBox object to push to the DOM
+    this.contentManager.createShape(this.currentLandmark.getId(), path)
+      .subscribe((resp: any) => {
+        const shapeObj = new ShapeBox({ 'id': resp.id, 'landmarkId': resp.landmarkId, 'd': resp.d, 'transformation': [1, 0, 0, 1, 0, 0] })
+        this.currentLandmark.shapeContent[shapeObj.id] = shapeObj;
+        this.newId = shapeObj.id;
+      });
+
+    
+  }
 
 
 

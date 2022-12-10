@@ -15,6 +15,9 @@
             <svg class="shape-display" viewBox="0, 0, 10, 10" (click)="view.addShape('circle')">
                 <circle cx="5.5" cy="5.5" r="4.5"></circle>
             </svg>
+            <svg class="shape-display" viewBox="0, 0, 10, 10" (click)="lineAdd === LINE_ADD.NONE ? lineAdd = LINE_ADD.DRAW_POINT : lineAdd = lineAdd; selectedIcon = ICON_SELECTED.NONE">
+                <line x1="1" y1="5.5" x2="9" y2="5.5" stroke="black" stroke-width="0.25px"></line>
+            </svg>
         </div>
         <!--
         <button (click)="view.addShape('square')">Square</button>
@@ -30,14 +33,7 @@
             <app-vertical-trail></app-vertical-trail>
         </nav>
         <main class="landmark-wrapper">
-            <app-view [editMode]="true" [currentLandmark]="state[state.length-1][1]" #view></app-view>
-
-
-            <!--
-        <main class="svg-wrapper" [ngStyle]="{'width': width.toString()+'px', 'height': height.toString()+'px'}">
-            
-            <app-view [h]="0.9*height" [w]="0.9*width" [currentLandmark]="currentLandmark" #view></app-view>
-        -->
+            <app-view [editMode]="true" [currentLandmark]="state[state.length-1][1]" [lineAdd]="lineAdd" (lineAdded)="lineAdded()" #view></app-view>
         </main>
         <aside class="legend">
             <app-legend></app-legend>
