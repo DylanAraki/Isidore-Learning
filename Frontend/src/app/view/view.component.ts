@@ -3,7 +3,7 @@ import { ImageBox, Landmark, ShapeBox, TextBox } from '../content';
 import { ContentService } from '../content.service';
 import { generateSquarePath, DEFAULT_RADIUS, generateTrianglePath, generateCirclePath, generateRightTrianglePath, generateParallelogram, createLine } from '../shapes';
 import { ChangeDetectorRef } from '@angular/core';
-import { LINE_ADD } from '../enums';
+import { ARC_ADD, LINE_ADD } from '../enums';
 import { outputAst } from '@angular/compiler';
 //import subjx from '../../../node_modules/subjx/types';
 //import { Observable } from 'rxjs';
@@ -11,6 +11,7 @@ import { outputAst } from '@angular/compiler';
 
 const subjx = require('../../../node_modules/subjx/dist/js/subjx'); //TODO: Try to avoid this
 
+//TODO: This thing is getting so long that I may want to make some abstract classes
 
 
 @Component({
@@ -19,26 +20,24 @@ const subjx = require('../../../node_modules/subjx/dist/js/subjx'); //TODO: Try 
   styleUrls: ['./view.component.css']
 })
 export class ViewComponent implements OnInit {
-
-  //private svgPoint: any; //TODO: Ditto
-  //private svgPosition: [number, number] = [0, 0];
-  //private contentCount!: number;
-  //protected draggable: any = null; //TODO: Typecast properly
-  //protected tempTextBox: TextBox;
-  //protected textObserver: ResizeObserver;;
-
-
   LINE_ADD = LINE_ADD;
+  ARC_ADD = ARC_ADD;
   @Input() editMode: boolean = false;
   @Input() currentLandmark!: Landmark;
   @Input() lineAdd: LINE_ADD = LINE_ADD.NONE;
+  @Input() arcAdd: ARC_ADD = ARC_ADD.NONE;
   @Output() lineAdded = new EventEmitter<LINE_ADD>();
+  @Output() arcAdded = new EventEmitter<ARC_ADD>();
 
   private landmarkDom: any; //Typecast better
   private landmarkPosition: any;
   private newId: string | null = null;
+  private textSizeObserver: ResizeObserver | null = null;
+  private textWrapperObserver: MutationObserver | null = null;
   protected draggable: any = null;
   protected tempLine: [number, number, number, number] | null = null;
+  protected tempTextBox: TextBox | null = null;
+  
 
   constructor(private contentManager: ContentService) { }
   ngOnInit(): void {
@@ -65,6 +64,23 @@ export class ViewComponent implements OnInit {
       else if (this.newId[0] === 's') {
         this.createImageOrShapeDraggable(this.newId, this.currentLandmark.shapeContent[this.newId]);
       }
+      //TODO: This whole setup is quite bush league. It works for now, but, wow...
+      else if(this.newId[0] === '_') {
+        //Get the div element wrapping the text in the foreign object
+        const textWrapElement: Element = document.getElementById(this.newId)!.firstElementChild!
+        //Put the cursor in the text editable portion
+        textWrapElement.querySelector("span")!.focus();
+        //Track the div wrapper's size changes so that the foreign object can have its height dynamically updated
+        this.textSizeObserver = new ResizeObserver(this.updateTextHeight);
+        this.textSizeObserver.observe(textWrapElement);
+
+        this.textWrapperObserver = new MutationObserver((mutationList) => {
+          if(mutationList[0].attributeName === 'height') {
+            this.tempTextBox!.height = +(<Element>mutationList[0].target).getAttribute('height')!;
+          }
+        })
+        this.textWrapperObserver.observe(textWrapElement.parentElement!, {attributes: true});
+      }
       this.newId = null;
     }
   }
@@ -74,6 +90,18 @@ export class ViewComponent implements OnInit {
       this.destroyDraggable();
     }
   }
+  private updateTextHeight(entries: any, observer: any) {
+    console.log(entries);
+    entries[0].target.parentElement.setAttribute('height', entries[0].target.offsetHeight);
+    //console.log(this.tempTextBox);
+    //this.tempTextBox!.height = entries[0].target.offsetHeight;
+    //console.log(this.tempTextBox);
+  }
+
+  protected addText(event: any) {
+    console.log(event);
+  }
+
   public addShape(shape: string) {
     //Generate the 'd' value to create an SVG path
     let newPath: string;
@@ -158,6 +186,13 @@ export class ViewComponent implements OnInit {
         this.landmarkPosition.x = event.clientX;
         this.landmarkPosition.y = event.clientY;
         this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
+        
+        this.destroyDraggable();
+
+        this.tempTextBox = new TextBox({
+          'landmarkId': this.currentLandmark.getId(), 'x': this.landmarkPosition.x, 'y': this.landmarkPosition.y, 'width': 200, 'height': 25, 'transformation': [1,0,0,1,0,0]
+        });
+        this.newId = this.tempTextBox.id;
       }
     }
     else {
@@ -201,7 +236,8 @@ export class ViewComponent implements OnInit {
       console.log(source);
     });
   }
-  startLine(event: any) {
+  //DRAW LINE FUNCTIONS
+  protected startLine(event: any) {
     event.stopPropagation();
     this.landmarkPosition.x = event.clientX;
     this.landmarkPosition.y = event.clientY;
@@ -210,21 +246,17 @@ export class ViewComponent implements OnInit {
 
     this.lineAdd = LINE_ADD.DRAW_LINE;
   }
-  drawLine(event: any) {
+  protected drawLine(event: any) {
     event.stopPropagation();
 
-
-    console.log("Ack?")
     this.landmarkPosition.x = event.clientX;
     this.landmarkPosition.y = event.clientY;
     this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
     this.tempLine![2] = this.landmarkPosition.x;
     this.tempLine![3] = this.landmarkPosition.y;
   }
-  endLine(event: any) {
+  protected endLine(event: any) {
     event.stopPropagation();
-
-    console.log("Hello?")
 
     this.landmarkPosition.x = event.clientX;
     this.landmarkPosition.y = event.clientY;
@@ -248,8 +280,22 @@ export class ViewComponent implements OnInit {
 
     
   }
+  //TODO: DRAW ARC FUNCTIONS
+  protected selectCentre(event: any) {
 
+  }
+  protected drawRadius(event: any) {
 
+  }
+  protected selectArcStart(event: any) {
+
+  }
+  protected drawAngle(event: any) {
+
+  }
+  protected endArc(event: any) {
+
+  }
 
 
 

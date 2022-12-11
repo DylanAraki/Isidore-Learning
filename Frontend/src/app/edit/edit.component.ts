@@ -6,7 +6,7 @@ import { LineOptionsComponent } from '../line-options/line-options.component';
 import { Map, Path, Landmark } from '../content';
 import { AuthenticationService } from '../authentication.service';
 import { faImage, faShapes } from '@fortawesome/free-solid-svg-icons';
-import { ICON_SELECTED, LINE_ADD } from '../enums';
+import { ICON_SELECTED, LINE_ADD, ARC_ADD } from '../enums';
 
 
 @Component({
@@ -33,11 +33,13 @@ export class EditComponent implements OnInit {
   
   ICON_SELECTED = ICON_SELECTED;
   LINE_ADD = LINE_ADD;
+  ARC_ADD = ARC_ADD;
 
   protected selectedIcon: ICON_SELECTED = ICON_SELECTED.NONE;
   protected faImage = faImage;
   protected faShapes = faShapes;
   protected lineAdd: LINE_ADD = LINE_ADD.NONE;
+  protected arcAdd: ARC_ADD = ARC_ADD.NONE;
 
   protected currentMap!: Map
   protected state!: [Path, Landmark][];
@@ -106,6 +108,9 @@ export class EditComponent implements OnInit {
   
   public lineAdded() {
     this.lineAdd = LINE_ADD.NONE;
+  }
+  public arcAdded() {
+    this.arcAdd = ARC_ADD.NONE;
   }
 
 

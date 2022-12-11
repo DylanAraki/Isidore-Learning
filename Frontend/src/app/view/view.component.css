@@ -9,21 +9,12 @@
 }
 .line-add:hover {
     cursor: crosshair;
-
 }
-/*
-.svg-wrapper {
-    background-color: #e6e6e6;
-    padding: 5%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.text-wrapper {
-    min-height: 50px;
-}
-foreignObject {
+.svg-landmark-text-wrapper {
     overflow: visible;
 }
-*/
+.landmark-text-wrapper {
+    width: 100%;
+    min-height: 1.5em;
+    background-color: red;
+}

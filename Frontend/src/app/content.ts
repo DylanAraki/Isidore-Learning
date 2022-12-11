@@ -165,7 +165,30 @@ export class ShapeBox {
     }
 }
 export class TextBox {
-
+    id: string;
+    landmarkId: number;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+    transformation: DOMMatrix;
+    text: string[]
+    constructor(textResponse: { [key: string]: any }) {
+        if('id' in textResponse) {
+            this.id = 't' + textResponse['id'].toString();
+            this.text = textResponse['content'];
+        }
+        else {
+            this.id = '_temporary';
+            this.text = [""];
+        }
+        this.landmarkId = textResponse['landmarkId'];
+        this.x = textResponse['x'];
+        this.y = textResponse['y'];
+        this.width = textResponse['width'];
+        this.height = textResponse['height'];
+        this.transformation = new DOMMatrix(textResponse['transformation']);
+    }
 }
 
 

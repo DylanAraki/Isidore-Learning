@@ -8,3 +8,9 @@ export enum LINE_ADD {
     DRAW_POINT = 1,
     DRAW_LINE = 2
 }
+export enum ARC_ADD {
+    NONE = 0,
+    DRAW_CENTRE = 1,
+    DRAW_RADIUS = 2,
+    DRAW_ARC = 3
+}

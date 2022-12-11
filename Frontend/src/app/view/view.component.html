@@ -6,6 +6,26 @@
             <line id="new-line" [attr.x1]="tempLine![0]" [attr.y1]="tempLine![1]" [attr.x2]="tempLine![2]" [attr.y2]="tempLine![3]" stroke="black" stroke-width="1px" opacity="0.5"></line>
         </g>
     </g>
+    <g *ngIf="arcAdd !== ARC_ADD.NONE">
+        <rect *ngIf="arcAdd === ARC_ADD.DRAW_CENTRE" x="0" y="0" width="1920" height="1080" fill="transparent" (click)="selectCentre($event)"></rect>
+        <g *ngIf="arcAdd === ARC_ADD.DRAW_RADIUS" (mousemove)="drawRadius($event)" (click)="selectArcStart($event)">
+            <rect x="0" y="0" width="1920" height="1080" fill="transparent"></rect>
+            <!--TODO: Add broken line-->
+        </g>
+        <g *ngIf="arcAdd === ARC_ADD.DRAW_ARC" (mouseMove)="drawAngle($event)" (click)="endArc($event)">
+            <rect x="0" y="0" width="1920" height="1080" fill="transparent"></rect>
+            <!--TODO: Add broken circle and solid circle-->
+        </g>
+    </g>
+
+
+    <foreignObject *ngIf="tempTextBox !== null" class="svg-landmark-text-wrapper" [id]="tempTextBox.id" [attr.x]="tempTextBox.x" [attr.y]="tempTextBox.y" [attr.width]="tempTextBox.width" [attr.height]="tempTextBox.height" [attr.transform]="tempTextBox.transformation">
+        <div id="edited-text-portion" class="landmark-text-wrapper">
+            <!-- <span *ngFor="let textSpan of tempTextBox.text" contenteditable="true">{{textSpan}}</span> -->
+            <span *ngFor="let textSpan of tempTextBox.text; let i = index" [id]="'edited-span-' + i.toString()" contenteditable="true" [innerHTML]="textSpan" (input)="addText($event)"></span>
+        </div>
+    </foreignObject>
+
 
     <image *ngFor="let imageBox of currentLandmark.imageContent | keyvalue" class="image-content" [id]="editMode ? imageBox.key : ''" [attr.href]="imageBox.value.image"
     [attr.x]="imageBox.value.x" [attr.y]="imageBox.value.y" [attr.width]="imageBox.value.width" [attr.height]="imageBox.value.height" [attr.transform]="imageBox.value.transformation">
