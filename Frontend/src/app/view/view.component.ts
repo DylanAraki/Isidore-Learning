@@ -5,6 +5,7 @@ import { generateSquarePath, DEFAULT_RADIUS, generateTrianglePath, generateCircl
 import { ChangeDetectorRef } from '@angular/core';
 import { ARC_ADD, LINE_ADD } from '../enums';
 import { outputAst } from '@angular/compiler';
+import { FormControl, FormGroup } from '@angular/forms';
 //import subjx from '../../../node_modules/subjx/types';
 //import { Observable } from 'rxjs';
 
@@ -37,11 +38,20 @@ export class ViewComponent implements OnInit {
   protected draggable: any = null;
   protected tempLine: [number, number, number, number] | null = null;
   protected tempTextBox: TextBox | null = null;
-  
+
+
+  editorForm!: FormGroup
+
+  onSubmit() {
+    console.log(this.editorForm.get('editor')!.value);
+  }
+
 
   constructor(private contentManager: ContentService) { }
   ngOnInit(): void {
-
+    this.editorForm = new FormGroup({
+      'editor': new FormControl()
+    })
   }
   ngAfterViewInit(): void {
     if (this.editMode) {
@@ -65,21 +75,46 @@ export class ViewComponent implements OnInit {
         this.createImageOrShapeDraggable(this.newId, this.currentLandmark.shapeContent[this.newId]);
       }
       //TODO: This whole setup is quite bush league. It works for now, but, wow...
-      else if(this.newId[0] === '_') {
+      else if (this.newId[0] === '_') {
         //Get the div element wrapping the text in the foreign object
-        const textWrapElement: Element = document.getElementById(this.newId)!.firstElementChild!
+        const textWrapElement: Element = document.getElementById(this.newId)!//.firstElementChild!
         //Put the cursor in the text editable portion
-        textWrapElement.querySelector("span")!.focus();
+        //textWrapElement.querySelector("span")!.focus();
+
         //Track the div wrapper's size changes so that the foreign object can have its height dynamically updated
-        this.textSizeObserver = new ResizeObserver(this.updateTextHeight);
-        this.textSizeObserver.observe(textWrapElement);
+        this.textSizeObserver = new ResizeObserver((entries: any, observer: any) => {
+          console.log(entries);
+          //entries[0].target.parentElement.setAttribute('height', entries[0].target.offsetHeight);
+
+          
+          if (this.draggable['typing']) {
+            this.draggable.exeResize({
+              dx: 0, dy: entries[0].target.offsetHeight - this.tempTextBox!.height
+            });
+
+            this.tempTextBox!.height = entries[0].target.offsetHeight;
+          }
+          this.draggable.fitControlsToSize();
+        });
+        this.textSizeObserver.observe(textWrapElement.firstElementChild!);
+        /* 
 
         this.textWrapperObserver = new MutationObserver((mutationList) => {
           if(mutationList[0].attributeName === 'height') {
             this.tempTextBox!.height = +(<Element>mutationList[0].target).getAttribute('height')!;
           }
         })
-        this.textWrapperObserver.observe(textWrapElement.parentElement!, {attributes: true});
+        this.textWrapperObserver.observe(textWrapElement.parentElement!, {attributes: true}); */
+
+
+        this.draggable = subjx('#' + this.newId).drag();
+        this.draggable['model'] = this.tempTextBox;
+        this.draggable['typing'] = true;
+
+        /* this.draggable.onResizeStart(() => { this.draggable['typing'] = false });
+        this.draggable.onResizeEnd(() => { this.draggable['typing'] = true }) */
+        this.draggable.on('resizeStart', ()=>{this.draggable['typing'] = false;});
+        this.draggable.on('resizeEnd', ()=>{this.draggable['typing'] = true;});
       }
       this.newId = null;
     }
@@ -90,13 +125,13 @@ export class ViewComponent implements OnInit {
       this.destroyDraggable();
     }
   }
-  private updateTextHeight(entries: any, observer: any) {
+  /* private updateTextHeight(entries: any, observer: any) {
     console.log(entries);
     entries[0].target.parentElement.setAttribute('height', entries[0].target.offsetHeight);
     //console.log(this.tempTextBox);
     //this.tempTextBox!.height = entries[0].target.offsetHeight;
     //console.log(this.tempTextBox);
-  }
+  } */
 
   protected addText(event: any) {
     console.log(event);
@@ -186,11 +221,11 @@ export class ViewComponent implements OnInit {
         this.landmarkPosition.x = event.clientX;
         this.landmarkPosition.y = event.clientY;
         this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
-        
+
         this.destroyDraggable();
 
         this.tempTextBox = new TextBox({
-          'landmarkId': this.currentLandmark.getId(), 'x': this.landmarkPosition.x, 'y': this.landmarkPosition.y, 'width': 200, 'height': 25, 'transformation': [1,0,0,1,0,0]
+          'landmarkId': this.currentLandmark.getId(), 'x': this.landmarkPosition.x, 'y': this.landmarkPosition.y, 'width': 200, 'height': 25, 'transformation': [1, 0, 0, 1, 0, 0]
         });
         this.newId = this.tempTextBox.id;
       }
@@ -201,13 +236,13 @@ export class ViewComponent implements OnInit {
   }
   private destroyDraggable() {
     if (this.draggable !== null) {
-      this.draggable['model'].updateContent(this.draggable.elements[0]);
+      /* this.draggable['model'].updateContent(this.draggable.elements[0]);
       this.contentManager.updateContent(this.draggable['model'])
         .subscribe((resp) => {
           console.log(resp);
-        })
+        })*/
       this.draggable.disable();
-      this.draggable = null;
+      this.draggable = null; 
     }
   }
   private createImageOrShapeDraggable(id: string, model: any) {
@@ -278,7 +313,7 @@ export class ViewComponent implements OnInit {
         this.newId = shapeObj.id;
       });
 
-    
+
   }
   //TODO: DRAW ARC FUNCTIONS
   protected selectCentre(event: any) {

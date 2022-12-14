@@ -1,13 +1,36 @@
-<svg [class.line-add]="lineAdd !== LINE_ADD.NONE" [class.landmark-display]="true"  [id]="editMode ? 'editable-landmark' : ''" viewBox="0, 0, 1920, 1080" (click)="clickLandmark($event)">
+<div *ngIf="editMode">
+    <div id="temp-toolbar">
+        <!-- Add font size dropdown -->
+        <select class="ql-size">
+            <option value="small">Small</option>
+            <!-- Note a missing, thus falsy value, is used to reset to default -->
+            <option selected></option>
+            <option value="large">Large</option>
+            <option value="huge">Huge</option>
+        </select>
+        <!-- Add a bold button -->
+        <button class="ql-bold">Bold</button>
+        <!-- Add subscript and superscript buttons -->
+        <button class="ql-script" value="sub">Subscript</button>
+        <button class="ql-script" value="super">Superscript</button>
+    </div>
+</div>
+
+<svg [class.line-add]="lineAdd !== LINE_ADD.NONE" [class.landmark-display]="true"
+    [id]="editMode ? 'editable-landmark' : ''" viewBox="0, 0, 1920, 1080" (click)="clickLandmark($event)">
     <g *ngIf="lineAdd !== LINE_ADD.NONE">
-        <rect *ngIf="lineAdd === LINE_ADD.DRAW_POINT" x="0" y="0" width="1920" height="1080" fill="transparent" (mousedown)="startLine($event)"></rect>
-        <g *ngIf="lineAdd === LINE_ADD.DRAW_LINE" (mousemove)="drawLine($event)" (mouseup)="endLine($event)" (click)="endLine($event)">
+        <rect *ngIf="lineAdd === LINE_ADD.DRAW_POINT" x="0" y="0" width="1920" height="1080" fill="transparent"
+            (mousedown)="startLine($event)"></rect>
+        <g *ngIf="lineAdd === LINE_ADD.DRAW_LINE" (mousemove)="drawLine($event)" (mouseup)="endLine($event)"
+            (click)="endLine($event)">
             <rect x="0" y="0" width="1920" height="1080" fill="transparent"></rect>
-            <line id="new-line" [attr.x1]="tempLine![0]" [attr.y1]="tempLine![1]" [attr.x2]="tempLine![2]" [attr.y2]="tempLine![3]" stroke="black" stroke-width="1px" opacity="0.5"></line>
+            <line id="new-line" [attr.x1]="tempLine![0]" [attr.y1]="tempLine![1]" [attr.x2]="tempLine![2]"
+                [attr.y2]="tempLine![3]" stroke="black" stroke-width="1px" opacity="0.5"></line>
         </g>
     </g>
     <g *ngIf="arcAdd !== ARC_ADD.NONE">
-        <rect *ngIf="arcAdd === ARC_ADD.DRAW_CENTRE" x="0" y="0" width="1920" height="1080" fill="transparent" (click)="selectCentre($event)"></rect>
+        <rect *ngIf="arcAdd === ARC_ADD.DRAW_CENTRE" x="0" y="0" width="1920" height="1080" fill="transparent"
+            (click)="selectCentre($event)"></rect>
         <g *ngIf="arcAdd === ARC_ADD.DRAW_RADIUS" (mousemove)="drawRadius($event)" (click)="selectArcStart($event)">
             <rect x="0" y="0" width="1920" height="1080" fill="transparent"></rect>
             <!--TODO: Add broken line-->
@@ -19,18 +42,32 @@
     </g>
 
 
-    <foreignObject *ngIf="tempTextBox !== null" class="svg-landmark-text-wrapper" [id]="tempTextBox.id" [attr.x]="tempTextBox.x" [attr.y]="tempTextBox.y" [attr.width]="tempTextBox.width" [attr.height]="tempTextBox.height" [attr.transform]="tempTextBox.transformation">
+    <foreignObject *ngIf="tempTextBox !== null" class="svg-landmark-text-wrapper" [id]="tempTextBox.id"
+        [attr.x]="tempTextBox.x" [attr.y]="tempTextBox.y" [attr.width]="tempTextBox.width"
+        [attr.height]="tempTextBox.height" [attr.transform]="tempTextBox.transformation">
         <div id="edited-text-portion" class="landmark-text-wrapper">
             <!-- <span *ngFor="let textSpan of tempTextBox.text" contenteditable="true">{{textSpan}}</span> -->
-            <span *ngFor="let textSpan of tempTextBox.text; let i = index" [id]="'edited-span-' + i.toString()" contenteditable="true" [innerHTML]="textSpan" (input)="addText($event)"></span>
+            <!--             <span *ngFor="let textSpan of tempTextBox.text; let i = index" [id]="'edited-span-' + i.toString()" contenteditable="true" [innerHTML]="textSpan" (input)="addText($event)"></span> -->
+
+
+            <form [formGroup]="editorForm" (ngSubmit)="onSubmit()" [ngStyle]="{'width': tempTextBox.width}">
+                <div class="form-group">
+                    <label for="editor"></label>
+                    <quill-editor formControlName="editor" [modules]="{toolbar: '#temp-toolbar'}" [style]="{'width': '100%'}"></quill-editor>
+                </div>
+            </form>
         </div>
     </foreignObject>
 
 
-    <image *ngFor="let imageBox of currentLandmark.imageContent | keyvalue" class="image-content" [id]="editMode ? imageBox.key : ''" [attr.href]="imageBox.value.image"
-    [attr.x]="imageBox.value.x" [attr.y]="imageBox.value.y" [attr.width]="imageBox.value.width" [attr.height]="imageBox.value.height" [attr.transform]="imageBox.value.transformation">
+    <image *ngFor="let imageBox of currentLandmark.imageContent | keyvalue" class="image-content"
+        [id]="editMode ? imageBox.key : ''" [attr.href]="imageBox.value.image" [attr.x]="imageBox.value.x"
+        [attr.y]="imageBox.value.y" [attr.width]="imageBox.value.width" [attr.height]="imageBox.value.height"
+        [attr.transform]="imageBox.value.transformation">
     </image>
-    <path *ngFor="let shapeBox of currentLandmark.shapeContent | keyvalue" class="shape-content" [id]="editMode ? shapeBox.key : ''" [attr.d]="shapeBox.value.d" [attr.transform]="shapeBox.value.transformation" stroke="black" stroke-width="1px"></path>
+    <path *ngFor="let shapeBox of currentLandmark.shapeContent | keyvalue" class="shape-content"
+        [id]="editMode ? shapeBox.key : ''" [attr.d]="shapeBox.value.d" [attr.transform]="shapeBox.value.transformation"
+        stroke="black" stroke-width="1px"></path>
 </svg>
 
 
