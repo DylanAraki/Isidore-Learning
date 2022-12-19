@@ -140,3 +140,11 @@ def updateLandmarkOrder(request, id):
         
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST) """
+
+
+
+@api_view(['DELETE'])
+def landmark(request, id):
+    obj = get_object_or_404(Landmark, pk=id)
+    obj.delete()
+    return Response(status=status.HTTP_200_OK)

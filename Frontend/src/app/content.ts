@@ -39,6 +39,14 @@ export class Map {
     }
     public getOwner() { return this.owner; }
     public getTitle() { return this.title; }
+    public setTitle(newTitle: string) { 
+        if(newTitle.length > 50) {
+            this.title = newTitle;
+        }
+        else {
+            this.title = newTitle; 
+        }   
+    }
 }
 export class Path {
     private id: number;
@@ -66,6 +74,10 @@ export class Path {
     public addToBackOfLandmarks(landmark: Landmark) {
         this.landmarks.push(landmark);
     }
+    public deleteLandmark(index: number) {
+        this.landmarks.splice(index, 1);
+        console.log(this.landmarks);
+    }
 }
 export class Landmark {
     private id: number;
@@ -80,6 +92,7 @@ export class Landmark {
     //public imageContent: ImageBox[] = [];
     public imageContent: { [id: string]: ImageBox } = {};
     public shapeContent: { [id: string]: ShapeBox } = {};
+    public textContent: { [id: string]: TextBox } = {};
 
     constructor(landmarkResponse: { [key: string]: any }) {
         this.id = landmarkResponse['id'];
@@ -91,6 +104,12 @@ export class Landmark {
         for(let shapeResponse of landmarkResponse['shapes']) {
             this.shapeContent['s' + shapeResponse['id']] = new ShapeBox(shapeResponse);
         }
+        if(landmarkResponse['text']) {
+            for(let textResponse of landmarkResponse['text']) {
+                this.textContent['t' + textResponse['id']] = new TextBox(textResponse);
+            }
+        }
+        
     }
     public getId(): number { return this.id; }
     public getOrder(): number { return this.order; }
@@ -172,22 +191,26 @@ export class TextBox {
     x: number;
     y: number;
     transformation: DOMMatrix;
-    text: string[]
+    content: any;
+    editorContent: any;
     constructor(textResponse: { [key: string]: any }) {
-        if('id' in textResponse) {
-            this.id = 't' + textResponse['id'].toString();
-            this.text = textResponse['content'];
-        }
-        else {
-            this.id = '_temporary';
-            this.text = [""];
-        }
+        this.id = 't' + textResponse['id'].toString();
+        //this.delta = "";
         this.landmarkId = textResponse['landmarkId'];
         this.x = textResponse['x'];
         this.y = textResponse['y'];
         this.width = textResponse['width'];
         this.height = textResponse['height'];
         this.transformation = new DOMMatrix(textResponse['transformation']);
+    }
+    public updateContent(element: any) {
+        //this.delta = element.innerHTML;
+
+        this.transformation = new DOMMatrix(element.getAttribute('transform'));
+        this.x = element.getAttribute("x");
+        this.y = element.getAttribute("y");
+        this.width = element.getAttribute("width");
+        this.height = element.getAttribute("height");
     }
 }
 

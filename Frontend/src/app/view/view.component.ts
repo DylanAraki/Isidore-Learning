@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { ImageBox, Landmark, ShapeBox, TextBox } from '../content';
 import { ContentService } from '../content.service';
 import { generateSquarePath, DEFAULT_RADIUS, generateTrianglePath, generateCirclePath, generateRightTrianglePath, generateParallelogram, createLine } from '../shapes';
@@ -6,6 +6,8 @@ import { ChangeDetectorRef } from '@angular/core';
 import { ARC_ADD, LINE_ADD } from '../enums';
 import { outputAst } from '@angular/compiler';
 import { FormControl, FormGroup } from '@angular/forms';
+import { HostListener } from '@angular/core';
+import Quill, { Delta } from 'quill';
 //import subjx from '../../../node_modules/subjx/types';
 //import { Observable } from 'rxjs';
 
@@ -21,6 +23,25 @@ const subjx = require('../../../node_modules/subjx/dist/js/subjx'); //TODO: Try 
   styleUrls: ['./view.component.css']
 })
 export class ViewComponent implements OnInit {
+  
+  onEditorCreated(editor: Quill) {
+    console.log(editor);
+    this.quill = editor;
+  }
+  quill!: Quill
+
+  handlers = {bold: (arg: boolean) => { 
+    console.log(arg);
+    const range = this.quill.getSelection();
+    if (this.quill.getFormat(range)['bold']) {
+      // Bold formatting is applied to the specified range
+      this.quill.format('bold', false);
+    } else {
+      // Bold formatting is not applied to the specified range
+      this.quill.format('bold', true);
+    } 
+   }}
+
   LINE_ADD = LINE_ADD;
   ARC_ADD = ARC_ADD;
   @Input() editMode: boolean = false;
@@ -34,24 +55,142 @@ export class ViewComponent implements OnInit {
   private landmarkPosition: any;
   private newId: string | null = null;
   private textSizeObserver: ResizeObserver | null = null;
-  private textWrapperObserver: MutationObserver | null = null;
   protected draggable: any = null;
   protected tempLine: [number, number, number, number] | null = null;
   protected tempTextBox: TextBox | null = null;
-
-
-  editorForm!: FormGroup
-
-  onSubmit() {
-    console.log(this.editorForm.get('editor')!.value);
+  private singleClickTimeout: any;
+  private tempId: number = 1; //TODO: Delete
+  protected editedTextId: string | null = null;
+  //test!: any; //{'ops': [{'insert': 'hello'}]};
+  test = {'ops': [{'attributes': {'link': "https://www.google.com"}, 'insert': 'dfklajd;sflkaj'}]}  
+  toolbarOptions = {
+    container: [],
+    handlers: {}
+  }
+  focusOnEditor(arg: any) {
+    console.log(arg);
+    console.log(typeof(arg));
+    console.log(arg.editor);
+    console.log(typeof(arg.editor));
+    
+  }
+  bold(arg: any) {
+    console.log("Bold")
+    console.log(arg)
   }
 
+  editorModules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+      ['blockquote', 'code-block'],
 
-  constructor(private contentManager: ContentService) { }
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+
+      [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+
+      [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+      [{ 'font': [] }],
+      [{ 'align': [] }],
+    ]
+  };
+
+
+  protected options: any = {'toolbar': document.getElementById('toolbar')};
+
+  @HostListener('click', ['$event', 'editable-landmark'])
+  protected clickLandmark(event: any) {
+    console.log("registered");
+    if (this.editMode) {
+      clearTimeout(this.singleClickTimeout);
+      //Wait 150 ms before handling this in case of a double click
+      this.singleClickTimeout = setTimeout(() => {
+        if (event.target !== this.landmarkDom) {
+          if (event.target.classList.contains('image-content')) {
+            if (this.draggable === null) {
+              //Make new draggable
+              this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.imageContent[event.target.id]);
+            }
+            else if (event.target.id !== this.draggable['model'].id) {
+              //Destroy existing draggable
+              this.destroyDraggable();
+              //Make new draggable
+              this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.imageContent[event.target.id]);
+            }
+          }
+          else if (event.target.classList.contains('shape-content')) {
+            if (this.draggable === null) {
+              //Make new draggable
+              this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.shapeContent[event.target.id]);
+            }
+            else if (event.target.id !== this.draggable['model'].id) {
+              //Destroy existing draggable
+              this.destroyDraggable();
+              //Make new draggable
+              this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.shapeContent[event.target.id]);
+            }
+          }
+        }
+        else {
+
+        }
+      }, 150);
+    }
+    else {
+
+    }
+  }
+  @HostListener('dblclick', ['$event', 'editable-landmark'])
+  protected doubleClickLandmark(event: any) {
+    if (this.editMode) {
+      clearTimeout(this.singleClickTimeout);
+      this.landmarkPosition.x = event.clientX;
+      this.landmarkPosition.y = event.clientY;
+      this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
+
+      this.destroyDraggable();  
+
+      /* this.tempTextBox = new TextBox({
+        'landmarkId': this.currentLandmark.getId(), 'x': this.landmarkPosition.x, 'y': this.landmarkPosition.y, 'width': 200, 'height': 25, 'transformation': [1, 0, 0, 1, 0, 0]
+      }); */
+      const textObj = new TextBox({
+        'id': this.tempId, 'landmarkId': this.currentLandmark.getId(), 'x': this.landmarkPosition.x, 'y': this.landmarkPosition.y, 'width': 200, 'height': 25, 'transformation': [1, 0, 0, 1, 0, 0]
+      });
+      this.currentLandmark.textContent[textObj.id] = textObj;
+      this.newId = textObj.id;
+
+      this.editedTextId = this.newId;
+      this.tempId++;
+    }
+  }
+/* export class MyComponent {
+  editorContent: any;
+
+  // retrieve the delta value from the database or other source
+  delta = {
+    "ops": [
+      { "insert": "Hello, world!" }
+    ]
+  };
+
+  constructor() {}
+
+  ngOnInit() {
+    this.editorContent.setValue(this.delta);
+  }
+}
+
+ */
+  @ViewChildren('editor') editors: QueryList<any>;
+
+
+  protected updateContent(event: any, textBox: TextBox) {
+    textBox.content = event.content;
+  }
+
+  constructor(private contentManager: ContentService) {this.editors = new QueryList<any>(); }
   ngOnInit(): void {
-    this.editorForm = new FormGroup({
-      'editor': new FormControl()
-    })
   }
   ngAfterViewInit(): void {
     if (this.editMode) {
@@ -61,6 +200,11 @@ export class ViewComponent implements OnInit {
       this.landmarkPosition.x = 960;
       this.landmarkPosition.y = 540;
     }
+
+    this.editors.forEach((editor: any) => {
+      console.log(editor)
+      editor.instance.setContents(editor);
+    });
   }
   ngAfterViewChecked(): void {
     //If waiting for a DOM element to be created to add a drag/rotate/resize box. Perhaps not the ideal approach, but it should be fine for now
@@ -83,10 +227,10 @@ export class ViewComponent implements OnInit {
 
         //Track the div wrapper's size changes so that the foreign object can have its height dynamically updated
         this.textSizeObserver = new ResizeObserver((entries: any, observer: any) => {
-          console.log(entries);
+          //console.log(entries);
           //entries[0].target.parentElement.setAttribute('height', entries[0].target.offsetHeight);
 
-          
+
           if (this.draggable['typing']) {
             this.draggable.exeResize({
               dx: 0, dy: entries[0].target.offsetHeight - this.tempTextBox!.height
@@ -97,24 +241,22 @@ export class ViewComponent implements OnInit {
           this.draggable.fitControlsToSize();
         });
         this.textSizeObserver.observe(textWrapElement.firstElementChild!);
-        /* 
-
-        this.textWrapperObserver = new MutationObserver((mutationList) => {
-          if(mutationList[0].attributeName === 'height') {
-            this.tempTextBox!.height = +(<Element>mutationList[0].target).getAttribute('height')!;
-          }
-        })
-        this.textWrapperObserver.observe(textWrapElement.parentElement!, {attributes: true}); */
 
 
         this.draggable = subjx('#' + this.newId).drag();
         this.draggable['model'] = this.tempTextBox;
         this.draggable['typing'] = true;
 
-        /* this.draggable.onResizeStart(() => { this.draggable['typing'] = false });
-        this.draggable.onResizeEnd(() => { this.draggable['typing'] = true }) */
-        this.draggable.on('resizeStart', ()=>{this.draggable['typing'] = false;});
-        this.draggable.on('resizeEnd', ()=>{this.draggable['typing'] = true;});
+        this.draggable.on('resizeStart', () => { this.draggable['typing'] = false; });
+        this.draggable.on('resizeEnd', () => { this.draggable['typing'] = true; });
+
+        this.draggable.storage.handles['bc'].remove();
+        this.draggable.storage.handles['tc'].remove();
+        this.draggable.storage.handles['ml'].remove()
+        this.draggable.storage.handles['tl'].remove();
+        this.draggable.storage.handles['bl'].remove();
+        this.draggable.storage.handles['tr'].remove();
+        this.draggable.storage.handles['br'].remove();
       }
       this.newId = null;
     }
@@ -125,18 +267,9 @@ export class ViewComponent implements OnInit {
       this.destroyDraggable();
     }
   }
-  /* private updateTextHeight(entries: any, observer: any) {
-    console.log(entries);
-    entries[0].target.parentElement.setAttribute('height', entries[0].target.offsetHeight);
-    //console.log(this.tempTextBox);
-    //this.tempTextBox!.height = entries[0].target.offsetHeight;
-    //console.log(this.tempTextBox);
-  } */
-
-  protected addText(event: any) {
+  public addText(event: any) {
     console.log(event);
   }
-
   public addShape(shape: string) {
     //Generate the 'd' value to create an SVG path
     let newPath: string;
@@ -187,62 +320,16 @@ export class ViewComponent implements OnInit {
     });
     reader.readAsDataURL(imgFile);
   }
-  protected clickLandmark(event: any) {
-    console.log("registered");
-    if (this.editMode) {
-      //This is slightly sketchy, I may admit. It may be better to create a temporary SVG point with the client values.
-      if (event.target !== this.landmarkDom) {
-        if (event.target.classList.contains('image-content')) {
-          if (this.draggable === null) {
-            //Make new draggable
-            this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.imageContent[event.target.id]);
-          }
-          else if (event.target.id !== this.draggable['model'].id) {
-            //Destroy existing draggable
-            this.destroyDraggable();
-            //Make new draggable
-            this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.imageContent[event.target.id]);
-          }
-        }
-        else if (event.target.classList.contains('shape-content')) {
-          if (this.draggable === null) {
-            //Make new draggable
-            this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.shapeContent[event.target.id]);
-          }
-          else if (event.target.id !== this.draggable['model'].id) {
-            //Destroy existing draggable
-            this.destroyDraggable();
-            //Make new draggable
-            this.createImageOrShapeDraggable(event.target.id, this.currentLandmark.shapeContent[event.target.id]);
-          }
-        }
-      }
-      else {
-        this.landmarkPosition.x = event.clientX;
-        this.landmarkPosition.y = event.clientY;
-        this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
 
-        this.destroyDraggable();
-
-        this.tempTextBox = new TextBox({
-          'landmarkId': this.currentLandmark.getId(), 'x': this.landmarkPosition.x, 'y': this.landmarkPosition.y, 'width': 200, 'height': 25, 'transformation': [1, 0, 0, 1, 0, 0]
-        });
-        this.newId = this.tempTextBox.id;
-      }
-    }
-    else {
-
-    }
-  }
   private destroyDraggable() {
     if (this.draggable !== null) {
-      /* this.draggable['model'].updateContent(this.draggable.elements[0]);
-      this.contentManager.updateContent(this.draggable['model'])
+      this.draggable['model'].updateContent(this.draggable.elements[0]);
+      /* this.contentManager.updateContent(this.draggable['model'])
         .subscribe((resp) => {
           console.log(resp);
-        })*/
+        }) */
       this.draggable.disable();
-      this.draggable = null; 
+      this.draggable = null;
     }
   }
   private createImageOrShapeDraggable(id: string, model: any) {
@@ -331,179 +418,4 @@ export class ViewComponent implements OnInit {
   protected endArc(event: any) {
 
   }
-
-
-
-  //constructor(private contentManager: ContentService, private ref: ChangeDetectorRef) {
-
-  //this.tempTextBox = new TextBox({ 'id': 0, 'landmarkId': 0, 'x': 0, 'y': 0, 'width': 50, 'height': 20, 'content': Array.of('') }, false); //TODO: This is just a hack...
-
-  /*this.textObserver = new ResizeObserver(entries => {
-    if (entries[0].contentRect) {
-      //console.log(this.tempTextBox.height);
-      //this.tempTextBox.height = this.tempTextBox.height < entries[0].contentRect.height ? entries[0].contentRect.height : this.tempTextBox.height;
-      //console.log(this.tempTextBox.height);
-      //this.ref.markForCheck();
-
-    }
-  });*/
-  //}
-
-  /* ngOnInit(): void {
-    //this.svgDom = document.getElementsByTagName("svg")[0];
-    //this.svgPoint = this.svgDom.createSVGPoint();
-    //this.contentCount = Object.keys(this.currentLandmark.getContent()).length; //TODO: Need a better way of mapping unsaved data
-
-
-  } */
-
-  /*
-  public addShape(shape: string) {
-    //Generate the 'd' value to create an SVG path
-    let newPath: string | undefined = undefined;
-    if (shape === 'square') {
-      newPath = generateSquarePath(this.svgPosition[0], this.svgPosition[1]);
-    }
-    else if (shape === 'circle') {
-      newPath = generateCirclePath(this.svgPosition[0], this.svgPosition[1]);
-    }
-    else if (shape === 'triangle') {
-      newPath = generateTrianglePath(this.svgPosition[0], this.svgPosition[1]);
-    }
-    else if (shape === 'right triangle') {
-      newPath = generateRightTrianglePath(this.svgPosition[0], this.svgPosition[1]);
-    }
-    else if (shape === 'parallelogram') {
-      newPath = generateParallelogram(this.svgPosition[0], this.svgPosition[1]);
-    }
-
-    //Create a ShapeBox object to push to the DOM
-    if (newPath !== undefined) {
-      this.contentCount++;
-      const shapeObj = new ShapeBox({
-        "id": this.contentCount.toString(), "landmarkId": this.currentLandmark.getId().toString(),
-        "x": (this.svgPosition[0] - DEFAULT_RADIUS).toString(), "y": (this.svgPosition[1] - DEFAULT_RADIUS).toString(),
-        "width": (2 * DEFAULT_RADIUS).toString(), "height": (2 * DEFAULT_RADIUS).toString(),
-        'content': newPath
-      }, false);
-      this.currentLandmark.addContent(shapeObj);
-    }
-  }
-
-
-  protected clickSvg(event: any) {
-    //TODO: It's a bit buggy right now. Sometimes multiple subjx wrappers will appear. Also, resize and drag will usually cancel the event
-    //TODO: Not to mention, this code is rather messy. Should probably do something about it...
-    if (event.target === this.svgDom) {
-      this.svgPoint.x = event.clientX;
-      this.svgPoint.y = event.clientY;
-      const clickCoordinates = this.svgPoint.matrixTransform(this.svgDom.getScreenCTM()?.inverse());
-      this.svgPosition[0] = clickCoordinates.x;
-      this.svgPosition[1] = clickCoordinates.y;
-
-      if (this.draggable !== null) {
-        //this.resetDraggable();
-      }
-      else {
-
-        this.textObserver.observe(document.querySelector(".text-wrapper")!);
-        this.tempTextBox = new TextBox({ 'id': 0, 'landmarkId': 0, 'x': this.svgPosition[0], 'y': this.svgPosition[1], 'width': 500, 'height': 55, 'content': Array.of('') }, false); //TODO: This is just a hack...
-
-      }
-
-
-
-    }
-    else if (event.target.classList.contains('text-content')) {
-      if (!this.draggable) {
-        this.draggable = subjx("#" + this.tempTextBox.cssId).drag(
-          {
-            onResize() {
-              //this.exeResize({dx: 0, dy: this['model'].height-this.storage.bBox.height})
-              this.storage.bBox.height = this['model'].height;
-              console.log(this.controls);
-              this.controls.setAttribute("height", this.storage.bBox.height.toString());
-              //console.log(this.controls);
-              console.log(this.storage.bBox);
-              console.log(this.storage.bBox.height);
-            }
-          }
-        );
-        this.draggable['model'] = this.tempTextBox;
-        this.draggable.storage.handles['bc'].remove();
-        this.draggable.storage.handles['tc'].remove();
-        this.draggable.storage.handles['ml'].remove()
-        this.draggable.storage.handles['tl'].remove();
-        this.draggable.storage.handles['bl'].remove();
-        this.draggable.storage.handles['tr'].remove();
-        this.draggable.storage.handles['br'].remove();
-      }
-      else {
-        //console.log(this.draggable.controls);
-        console.log(typeof (this.draggable.storage.handles));
-        console.log(this.draggable.storage.handles);
-        //delete this.draggable.storage['bc'];
-        //console.log(this.draggable.storage.handles['bc']);
-
-        
-      }
-
-
-    }
-    else if (event.target.classList.contains("image-content") || event.target.classList.contains("shape-content")) {
-      //If a new piece of content is clicked, destroy the existing moving box
-      if (this.draggable !== null) {
-        if (event.target.parentNode.id === this.draggable['model'].cssId) {
-          return;
-        }
-        else {
-          this.resetDraggable();
-        }
-      }
-      this.draggable = subjx("#" + event.target.parentNode.id).drag({
-        //proportions: true,
-        onDestroy(e1: any) {
-          //Update the data to refelct the movement
-          if (e1[0].transform['animVal'][0].matrix) {
-            this['model'].setTransformation(e1[0].transform['animVal'][0].matrix);
-            if (this['type'] === 'image') {
-              this['model'].move(e1[0].firstChild.x.animVal.value, e1[0].firstChild.y.animVal.value);
-              this['model'].resize(e1[0].firstChild.width.animVal.value, e1[0].firstChild.height.animVal.value)
-            }
-            else if (this['type'] === 'shape') {
-              console.log(typeof (e1[0].firstElementChild.getAttribute('d')));
-              console.log(e1[0].firstElementChild.getAttribute('d'));
-              this['model'].content[0] = e1[0].firstElementChild.getAttribute('d');
-            }
-
-          }
-        }
-      });
-      //Assign the view and model of the draggable
-      this.draggable['model'] = this.currentLandmark.getContent()[event.target.parentNode.id];
-      if (event.target.classList.contains("image-content")) {
-        this.draggable['type'] = 'image';
-        //this.draggable['proportions'] = true;
-        this.draggable['options'].proportions = true;
-      }
-      else if (event.target.classList.contains("shape-content")) {
-        this.draggable['type'] = 'shape';
-        //this.draggable['proportions'] = false;
-      }
-      else if (event.target.classList.contains("text-content")) {
-
-      }
-    }
-  }
-  private resetDraggable() {
-    this.draggable.disable();
-    this.draggable = null;
-    const disabling = new Promise((resolve) => {
-      resolve(this.draggable.disable());
-    })
-    disabling.then(() => {
-      this.draggable = null;
-    })
-  }
-  */
 }

@@ -26,7 +26,8 @@ urlpatterns = [
     path('create-image/', views.createImage),
     path('image-boxes/<int:id>/', views.updateImage),
     path('shape-boxes/<int:id>/', views.updateShape),
-    path('landmark/', views.createLandmark),
+    path('create-landmark/', views.createLandmark),
+    path('landmark/<int:id>/', views.landmark),
     path('landmark-order/<int:id>/', views.updateLandmarkOrder),
     path('create-shape/', views.createShape)
     #path('save/', views.save)

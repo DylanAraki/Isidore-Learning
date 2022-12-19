@@ -2,6 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Landmark, Path } from '../content';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ContentService } from '../content.service';
+import { Scrollbar } from 'smooth-scrollbar/scrollbar';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-horizontal-trail',
@@ -11,10 +13,12 @@ import { ContentService } from '../content.service';
 export class HorizontalTrailComponent implements OnInit {
 
   @Input() curState!: [Path, Landmark];
+  protected faTrash = faTrash;
 
   constructor(private contentManager: ContentService) { }
 
   ngOnInit(): void {
+    //const sb = new Scrollbar(document.querySelector('#horizontal-trail-wrap')!);
   }
 
   protected addLandmark(start: boolean) {
@@ -27,6 +31,14 @@ export class HorizontalTrailComponent implements OnInit {
         this.curState[0].addToBackOfLandmarks(new Landmark(resp));
       }
     })
+  }
+  protected deleteLandmark(event: MouseEvent, index: number, landmark: Landmark) {
+    event.stopPropagation();
+    this.contentManager.deleteLandmark(landmark.getId())
+    .subscribe((e) => {console.log(e)});
+
+    this.curState[0].deleteLandmark(index);
+    
   }
   protected changeSlide(landmark: Landmark) {
     if(landmark !== this.curState[1]) {

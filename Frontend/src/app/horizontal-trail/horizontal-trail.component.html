@@ -1,9 +1,10 @@
-<div id="horizontal-trail-wrap" cdkDropList [cdkDropListData]="curState[0].getLandmarks()" (cdkDropListDropped)="changeLandmarkOrder($event)" cdkDropListOrientation="horizontal">
+<div id="horizontal-trail-wrap"  cdkDropList [cdkDropListData]="curState[0].getLandmarks()" (cdkDropListDropped)="changeLandmarkOrder($event)" cdkDropListOrientation="horizontal">
     <button class="add-landmark-btn" (click)="addLandmark(true)">+</button>
     <div *ngFor="let landmark of curState[0].getLandmarks(); let i = index" class="landmark-entry">
         {{i+1}}
         <div cdkDrag cdkDragHandle [id]="curState[1]===landmark ? 'selected-landmark' : ''" class="landmark-image" (click)="changeSlide(landmark)">
-            <app-view [editMode]="false" [currentLandmark]="landmark"></app-view>
+            <!-- <app-view [editMode]="false" [currentLandmark]="landmark"></app-view> -->
+            <fa-icon *ngIf="curState[1] !== landmark" [icon]="faTrash" class="trash" (click)="deleteLandmark($event, i, landmark)"></fa-icon>
         </div>
     </div>
     <button class="add-landmark-btn" (click)="addLandmark(false)">+</button>

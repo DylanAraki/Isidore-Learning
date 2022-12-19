@@ -106,6 +106,16 @@ export class EditComponent implements OnInit {
     }
   }
   
+  get title(): string {
+    return this.currentMap.getTitle();
+  }
+  set title(newTitle: string) {
+    this.currentMap.setTitle(newTitle);
+  }
+  
+
+
+
   public lineAdded() {
     this.lineAdd = LINE_ADD.NONE;
   }

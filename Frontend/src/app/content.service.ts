@@ -47,7 +47,7 @@ export class ContentService {
     })
   }
   public createLandmark(offset: number, pathId: number, adjacentLandmark: Landmark): Observable<any> {
-    return this.http.post(this.url + 'landmark/',
+    return this.http.post(this.url + 'create-landmark/',
       {
         'pathId': pathId,
         'order': adjacentLandmark.getOrder() + offset
@@ -101,9 +101,9 @@ export class ContentService {
     else if (box.id[0] == 's') {
       return this.updateShapeBox(box);
     }
+
     return this.updateImageBox(box); //TODO: TEMP
   }
-
   //HTTP OR LOCAL GET REQUESTS
   public checkMap(id: number): Map | null {
     if (id in this.maps) {
@@ -126,5 +126,10 @@ export class ContentService {
   }
   public getMainPath(mapId: number): Observable<any> {
     return this.http.get(this.url + 'main-path/' + mapId + '/');
+  }
+
+  //HTTP DELETE REQUESTS
+  public deleteLandmark(id: number): Observable<any> {
+    return this.http.delete(this.url + 'landmark/' + id + '/');
   }
 }

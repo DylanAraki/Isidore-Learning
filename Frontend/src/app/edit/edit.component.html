@@ -1,4 +1,30 @@
-<div *ngIf="state !== undefined && currentMap !== undefined" class="edit-wrap">
+<!-- 
+    Top Section
+        Title (contentEditable=true, make it an ng form with a limit of 50 characters)
+
+        Horizontal Trail
+
+        Image
+        Shape
+        Text
+
+        Save
+        Publish
+    Bottom Section
+ -->
+ <div *ngIf="state !== undefined && currentMap !== undefined" class="edit-wrap">
+    <div class="top">
+        <textarea id="map-title" type="text" [(ngModel)]="title" name="title" maxlength="50" wrap="hard" cols="25" rows="2"></textarea>
+        <app-horizontal-trail id="horizontal-trail" [curState]="state[state.length-1]"></app-horizontal-trail>
+        <div id="edit-options">
+
+        </div>
+    </div>
+    <div class="bot"></div>
+ </div>
+
+
+<!-- <div *ngIf="state !== undefined && currentMap !== undefined" class="edit-wrap">
     <div class="top">
         <h1>{{currentMap.getTitle()}}</h1>
         <app-horizontal-trail [curState]="state[state.length-1]"></app-horizontal-trail>
@@ -21,15 +47,19 @@
             <svg class="shape-display" viewBox="0, 0, 10, 10" (click)="arcAdd === ARC_ADD.NONE && lineAdd === LINE_ADD.NONE ? arcAdd = ARC_ADD.DRAW_CENTRE : arcAdd = arcAdd; selectedIcon = ICON_SELECTED.NONE">
                 <path d="M10 8 a 5 5 0 1 0 -10 0" stroke="black" fill="none" stroke-width="0.25px"></path>
             </svg>
+        </div> 
+        <div id="toolbar">
+            <select class="ql-size">
+                <option selected></option>
+                <option value="large">Large</option>
+                <option value="huge">Huge</option>
+            </select>
+            <span class="ql-formats">
+                <button class="ql-bold">Bold</button>
+                <button class="ql-script" value="sub">Subscript</button>
+                <button class="ql-script" value="super">Superscript</button>
+            </span>
         </div>
-        <!--
-        <button (click)="view.addShape('square')">Square</button>
-        <button (click)="view.addShape('circle')">Circle</button>
-        <button (click)="view.addShape('triangle')">Triangle</button>
-        <button (click)="view.addShape('right triangle')">Right Triangle</button>
-        <button (click)="view.addShape('parallelogram')">Parallelogram</button>
-        <button (click)="lineOptions()">Create line</button>
-        -->
     </div>
     <div class="bot">
         <nav *ngIf="state.length > 1" class="vertical-nav">
@@ -43,4 +73,4 @@
         </aside>
     </div>
     <ng-container #editOptions></ng-container>
-</div>
+</div> -->
