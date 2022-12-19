@@ -28,5 +28,5 @@ class MapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Map
         #fields = ['id', 'owner', 'title', 'publicity', 'description', 'topic']
-        fields = ['id', 'owner', 'lastSaved']
+        fields = ['id', 'owner', 'title', 'lastSaved']
         #TODO: Depth?

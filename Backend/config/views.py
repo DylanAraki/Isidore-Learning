@@ -51,16 +51,22 @@ def createMap(request): #Will also create a path and a landmark
     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['GET'])
-def getMap(request, id): #The client requests access to a map by its ID
+@api_view(['GET', 'PUT'])
+def map(request, id):
     try:
         map = Map.objects.get(pk=id)
     except Map.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    
+
+
     if request.method == 'GET':
         serializer = MapSerializer(map)
         return Response(serializer.data)
+    elif request.method == 'PUT':
+        if 'title' in request.data:
+            map.title = request.data['title']
+            map.save(update_fields=['title'])
+        return Response(status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def getPath(request, id): #The client request access to a path (and its landmarks and their content) by ID

@@ -47,6 +47,7 @@ export class Map {
             this.title = newTitle; 
         }   
     }
+    public getId() { return this.id; }
 }
 export class Path {
     private id: number;

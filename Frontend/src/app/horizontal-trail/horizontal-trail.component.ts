@@ -38,7 +38,6 @@ export class HorizontalTrailComponent implements OnInit {
     .subscribe((e) => {console.log(e)});
 
     this.curState[0].deleteLandmark(index);
-    
   }
   protected changeSlide(landmark: Landmark) {
     if(landmark !== this.curState[1]) {

@@ -104,6 +104,10 @@ export class ContentService {
 
     return this.updateImageBox(box); //TODO: TEMP
   }
+
+  public changeTitle(id: number, newTitle: string) {
+    return this.http.put(this.url + 'map/' + id + '/', {'title': newTitle});
+  }
   //HTTP OR LOCAL GET REQUESTS
   public checkMap(id: number): Map | null {
     if (id in this.maps) {

@@ -7,6 +7,9 @@ import { Map, Path, Landmark } from '../content';
 import { AuthenticationService } from '../authentication.service';
 import { faImage, faShapes } from '@fortawesome/free-solid-svg-icons';
 import { ICON_SELECTED, LINE_ADD, ARC_ADD } from '../enums';
+import { FormControl } from '@angular/forms';
+import { debounceTime } from 'rxjs/operators';
+
 
 
 @Component({
@@ -43,6 +46,7 @@ export class EditComponent implements OnInit {
 
   protected currentMap!: Map
   protected state!: [Path, Landmark][];
+  private titleTimeout: any;
 
   constructor(private contentManager: ContentService, private route: ActivatedRoute, private router: Router, private authenticator: AuthenticationService) {
   }
@@ -112,7 +116,13 @@ export class EditComponent implements OnInit {
   set title(newTitle: string) {
     this.currentMap.setTitle(newTitle);
   }
-  
+  protected titleChange(event: KeyboardEvent) {
+    clearTimeout(this.titleTimeout);
+    this.titleTimeout = setTimeout(() => {
+      this.contentManager.changeTitle(this.currentMap.getId(), this.currentMap.getTitle())
+      .subscribe((e) => {console.log(e)})
+    }, 2500);
+  }
 
 
 
