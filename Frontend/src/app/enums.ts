@@ -2,6 +2,9 @@ export enum ICON_SELECTED {
     NONE = 0,
     IMAGE = 1,
     SHAPES = 2,
+    TEXT = 3,
+    APPEARANCE = 4,
+    DELETE = 5,
 }
 export enum LINE_ADD {
     NONE = 0,

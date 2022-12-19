@@ -1,57 +1,3 @@
-<!-- <div *ngIf="editMode">
-    <div id="temp-toolbar">
-        <select class="ql-size">
-            <option value="small">Small</option>
-            <option selected></option>
-            <option value="large">Large</option>
-            <option value="huge">Huge</option>
-        </select>
-        <button class="ql-bold">Bold</button>
-        <button class="ql-script" value="sub">Subscript</button>
-        <button class="ql-script" value="super">Superscript</button>
-    </div>
-</div> -->
-
-<div *ngIf="editMode" id="test-toolbar" >
-    <span class="ql-formats">
-        <select class="ql-font">
-          <option selected></option>
-          <option value="serif"></option>
-          <option value="monospace"></option>
-        </select>
-        <select class="ql-size">
-          <option value="small"></option>
-          <option selected></option>
-          <option value="large"></option>
-          <option value="huge"></option>
-        </select>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-bold"></button>
-        <button class="ql-italic"></button>
-        <button class="ql-underline"></button>
-        <button class="ql-strike"></button>
-      </span>
-      <span class="ql-formats">
-        <select class="ql-color"></select>
-        <select class="ql-background"></select>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-list" value="ordered"></button>
-        <button class="ql-list" value="bullet"></button>
-        <select class="ql-align">
-          <option selected></option>
-          <option value="center"></option>
-          <option value="right"></option>
-          <option value="justify"></option>
-        </select>
-      </span>
-      <span class="ql-formats">
-        <button class="ql-link"></button>
-        <button class="ql-image"></button>
-      </span>
-</div>
-
 <svg [class.line-add]="lineAdd !== LINE_ADD.NONE" [class.landmark-display]="true"
     [id]="editMode ? 'editable-landmark' : ''" viewBox="0, 0, 1920, 1080">
     <g *ngIf="lineAdd !== LINE_ADD.NONE">
@@ -76,21 +22,6 @@
             <!--TODO: Add broken circle and solid circle-->
         </g>
     </g>
-
-
-    <!-- <foreignObject *ngIf="tempTextBox !== null && currentLandmark.textContent['_temporary'] === undefined" class="svg-landmark-text-wrapper" [id]="tempTextBox.id"
-        [attr.x]="tempTextBox.x" [attr.y]="tempTextBox.y" [attr.width]="tempTextBox.width"
-        [attr.height]="tempTextBox.height" [attr.transform]="tempTextBox.transformation">
-        <div id="edited-text-portion" class="landmark-text-wrapper">
-            <form [formGroup]="editorForm" (ngSubmit)="onSubmit()" [ngStyle]="{'width': tempTextBox.width}">
-                <div class="form-group">
-                    <label for="editor"></label>
-                    <quill-editor formControlName="editor" [modules]="{toolbar: '#temp-toolbar'}" [style]="{'width': '100%'}"></quill-editor>
-                </div>
-            </form>
-        </div> 
-    </foreignObject> -->
-
     <!--Display images-->
     <image *ngFor="let imageBox of currentLandmark.imageContent | keyvalue" class="image-content"
         [id]="editMode ? imageBox.key : ''" [attr.href]="imageBox.value.image" [attr.x]="imageBox.value.x"
@@ -103,32 +34,4 @@
         stroke="black" stroke-width="1px">
     </path>
     <!--Display text-->
-    <foreignObject *ngFor="let textBox of currentLandmark.textContent | keyvalue" [id]="textBox.key" class="svg-landmark-text-wrapper" [attr.x]="textBox.value.x" [attr.y]="textBox.value.y" [attr.width]="textBox.value.width" [attr.height]="textBox.value.height" [attr.transformation]="textBox.value.transformation">
-        <div class="landmark-text-wrapper" [style]="{'width': '100%'}">
-            <quill-editor 
-            [readOnly]="!editMode" 
-            [style]="{'width': '100%'}" 
-            placeholder=""
-            [format]="'object'"
-            [(ngModel)]="textBox.value.content"
-            [preserveWhitespace]="true"
-            (onEditorCreated)="focusOnEditor($event)"
-            ></quill-editor>
-        </div>
-    </foreignObject>
-
-
-    <!-- <foreignObject x="0" y="0" width="500" height="500">
-        <quill-view [content]="test" [preserveWhitespace]="true" [format]="'object'"></quill-view>
-    </foreignObject>  -->
-    <foreignObject x="0" y="0" width="500" height="500">
-        <quill-editor [(ngModel)]="test" [readOnly]="false" [format]="'object'" [modules]="{'toolbar': {'container': '#toolbar', 'handlers': handlers}}" (onEditorCreated)="onEditorCreated($event)"></quill-editor>
-    </foreignObject>
 </svg>
-<div></div>
-
-
-<!--
-    [modules]="{toolbar: {container: ['size', 'font', 'bold', 'italic', 'underline', 'strike', 'script', 'color', 'blockquote', 'header', 'indent', 'list', 'code-block']}}"
-
--->
