@@ -23,15 +23,22 @@
         </g>
     </g>
     <!--Display images-->
-    <image *ngFor="let imageBox of currentLandmark.imageContent | keyvalue" class="image-content"
+    <!-- <image *ngFor="let imageBox of currentLandmark.imageContent | keyvalue" class="image-content"
         [id]="editMode ? imageBox.key : ''" [attr.href]="imageBox.value.image" [attr.x]="imageBox.value.x"
         [attr.y]="imageBox.value.y" [attr.width]="imageBox.value.width" [attr.height]="imageBox.value.height"
         [attr.transform]="imageBox.value.transformation">
-    </image>
+    </image> -->
     <!--Display shapes-->
-    <path *ngFor="let shapeBox of currentLandmark.shapeContent | keyvalue" class="shape-content"
+    <!-- <path *ngFor="let shapeBox of currentLandmark.shapeContent | keyvalue" class="shape-content"
         [id]="editMode ? shapeBox.key : ''" [attr.d]="shapeBox.value.d" [attr.transform]="shapeBox.value.transformation"
         stroke="black" stroke-width="1px">
-    </path>
+    </path> -->
     <!--Display text-->
+    <foreignObject *ngFor="let textBox of currentLandmark.textContent | keyvalue" class="svg-landmark-text-wrapper" [id]="editMode ? textBox.key : ''" 
+    [attr.x]="textBox.value.x" [attr.y]="textBox.value.y" [attr.height]="textBox.value.height" [attr.width]="textBox.value.width">
+        <div class="landmark-text-wrapper">
+            <quill-editor class="text-content" [modules]="{ toolbar: [['bold', 'italic', 'formula']] }" (onEditorCreated)="onEditorCreated($event)">
+            </quill-editor>
+        </div>
+    </foreignObject>
 </svg>

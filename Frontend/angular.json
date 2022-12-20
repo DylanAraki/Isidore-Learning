@@ -20,7 +20,12 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/mathlive/dist/fonts",
+                "output": "/assets/mathlive/fonts"
+              }
             ],
             "styles": [
               "src/custom-theme.scss",
@@ -88,7 +93,12 @@
             "karmaConfig": "karma.conf.js",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "node_modules/mathlive/dist/fonts",
+                "output": "/assets/mathlive/fonts"
+              }
             ],
             "styles": [
               "src/styles.css"

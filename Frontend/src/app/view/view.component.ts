@@ -23,25 +23,6 @@ const subjx = require('../../../node_modules/subjx/dist/js/subjx'); //TODO: Try 
   styleUrls: ['./view.component.css']
 })
 export class ViewComponent implements OnInit {
-  
-  onEditorCreated(editor: Quill) {
-    console.log(editor);
-    this.quill = editor;
-  }
-  quill!: Quill
-
-  handlers = {bold: (arg: boolean) => { 
-    console.log(arg);
-    const range = this.quill.getSelection();
-    if (this.quill.getFormat(range)['bold']) {
-      // Bold formatting is applied to the specified range
-      this.quill.format('bold', false);
-    } else {
-      // Bold formatting is not applied to the specified range
-      this.quill.format('bold', true);
-    } 
-   }}
-
   LINE_ADD = LINE_ADD;
   ARC_ADD = ARC_ADD;
   @Input() editMode: boolean = false;
@@ -62,17 +43,17 @@ export class ViewComponent implements OnInit {
   private tempId: number = 1; //TODO: Delete
   protected editedTextId: string | null = null;
   //test!: any; //{'ops': [{'insert': 'hello'}]};
-  test = {'ops': [{'attributes': {'link': "https://www.google.com"}, 'insert': 'dfklajd;sflkaj'}]}  
+  test = { 'ops': [{ 'attributes': { 'link': "https://www.google.com" }, 'insert': 'dfklajd;sflkaj' }] }
   toolbarOptions = {
     container: [],
     handlers: {}
   }
   focusOnEditor(arg: any) {
     console.log(arg);
-    console.log(typeof(arg));
+    console.log(typeof (arg));
     console.log(arg.editor);
-    console.log(typeof(arg.editor));
-    
+    console.log(typeof (arg.editor));
+
   }
   bold(arg: any) {
     console.log("Bold")
@@ -84,9 +65,9 @@ export class ViewComponent implements OnInit {
       ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
       ['blockquote', 'code-block'],
 
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
-      [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+      [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+      [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
 
       [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
 
@@ -95,9 +76,22 @@ export class ViewComponent implements OnInit {
       [{ 'align': [] }],
     ]
   };
+  public onEditorCreated(quill: Quill) {
+    this.enableMathLive(quill);  // Insert MathLive field when the formula button is clicked.
+  }
 
+  // Sets a handler for the formula button in quill toolbar to insert a mathlive blot.
+  private enableMathLive(quill: Quill) {
+    quill.getModule('toolbar').addHandler('formula', () => {
+      const range = quill.getSelection() || { index: quill.getLength() - 1 };
+      let cursorPos = range.index;  // Get cursor position.
 
-  protected options: any = {'toolbar': document.getElementById('toolbar')};
+      console.log('insert MathLive Blot into quill.');
+      quill.insertEmbed(cursorPos, 'mathlive', 'INSERT', 'user');
+    });
+  }
+
+  protected options: any = { 'toolbar': document.getElementById('toolbar') };
 
   @HostListener('click', ['$event', 'editable-landmark'])
   protected clickLandmark(event: any) {
@@ -149,7 +143,7 @@ export class ViewComponent implements OnInit {
       this.landmarkPosition.y = event.clientY;
       this.landmarkPosition = this.landmarkPosition.matrixTransform(this.landmarkDom.getScreenCTM()?.inverse());
 
-      this.destroyDraggable();  
+      this.destroyDraggable();
 
       /* this.tempTextBox = new TextBox({
         'landmarkId': this.currentLandmark.getId(), 'x': this.landmarkPosition.x, 'y': this.landmarkPosition.y, 'width': 200, 'height': 25, 'transformation': [1, 0, 0, 1, 0, 0]
@@ -164,24 +158,24 @@ export class ViewComponent implements OnInit {
       this.tempId++;
     }
   }
-/* export class MyComponent {
-  editorContent: any;
-
-  // retrieve the delta value from the database or other source
-  delta = {
-    "ops": [
-      { "insert": "Hello, world!" }
-    ]
-  };
-
-  constructor() {}
-
-  ngOnInit() {
-    this.editorContent.setValue(this.delta);
+  /* export class MyComponent {
+    editorContent: any;
+  
+    // retrieve the delta value from the database or other source
+    delta = {
+      "ops": [
+        { "insert": "Hello, world!" }
+      ]
+    };
+  
+    constructor() {}
+  
+    ngOnInit() {
+      this.editorContent.setValue(this.delta);
+    }
   }
-}
-
- */
+  
+   */
   @ViewChildren('editor') editors: QueryList<any>;
 
 
@@ -189,7 +183,7 @@ export class ViewComponent implements OnInit {
     textBox.content = event.content;
   }
 
-  constructor(private contentManager: ContentService) {this.editors = new QueryList<any>(); }
+  constructor(private contentManager: ContentService) { this.editors = new QueryList<any>(); }
   ngOnInit(): void {
   }
   ngAfterViewInit(): void {

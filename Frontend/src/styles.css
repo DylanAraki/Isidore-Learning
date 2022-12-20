@@ -9,3 +9,15 @@
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+math-field {
+    display: inline-block;
+    font-size: 20px;
+}
+.ql-container {
+    font-size: 20px;
+}
+.ql-editor {
+    overflow-x: hidden;
+}

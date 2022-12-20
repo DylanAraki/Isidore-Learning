@@ -15,5 +15,26 @@
 .landmark-text-wrapper {
     width: 100%;
     min-height: 1.5em;
-    background-color: red;
+ }
+.text-content {
+    width: 100%;
 }
+
+/* math-field {
+    display: inline;
+    width: 0;
+    overflow-x: visible;
+}
+.ML__container {
+    width: 0 !important;
+} */
+
+
+/* math-field {
+    display: inline-block;  
+    white-space: normal;
+    min-width: 40px;  
+    background: #f8f8f8;  
+    border: 1px solid #eee;  
+    border-radius: 5px;
+  } */

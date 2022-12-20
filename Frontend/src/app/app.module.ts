@@ -25,7 +25,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 
-import { QuillModule } from 'ngx-quill'
+import { QuillModule } from 'ngx-quill';
+import { MathliveBlot } from './math-live-blot'
 
 
 
@@ -61,7 +62,7 @@ import { QuillModule } from 'ngx-quill'
     ReactiveFormsModule,
     MatToolbarModule
   ],
-  providers: [],
+  providers: [MathliveBlot],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
