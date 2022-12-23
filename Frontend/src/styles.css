@@ -14,10 +14,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 math-field {
     display: inline-block;
     font-size: 20px;
+    white-space: normal;
+    min-width: 40px;
+    background: #f8f8f8;
 }
 .ql-container {
     font-size: 20px;
 }
 .ql-editor {
     overflow-x: hidden;
+}
+
+:root {
+    --keyboard-zindex: 1005; 
 }

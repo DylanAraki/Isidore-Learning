@@ -27,16 +27,7 @@
     height: 100%;
     margin: 0 10px;
 }
-#actions {
-    display: flex;
-    gap: 5px;
-}
-fa-icon {
-    font-size: 30px;
-}
-.selected-icon {
-    color: blue;
-}
+
 
 
 .bot {

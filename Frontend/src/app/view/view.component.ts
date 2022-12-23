@@ -48,6 +48,13 @@ export class ViewComponent implements OnInit {
     container: [],
     handlers: {}
   }
+  testFun(textBox: string) {
+    console.log("Heyyy")
+    console.log(textBox);
+  }
+
+
+
   focusOnEditor(arg: any) {
     console.log(arg);
     console.log(typeof (arg));

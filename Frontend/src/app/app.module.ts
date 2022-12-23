@@ -27,6 +27,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { QuillModule } from 'ngx-quill';
 import { MathliveBlot } from './math-live-blot'
+import { PathLinkBlot } from './path-link-blot';
+import { EditOptionsComponent } from './edit-options/edit-options.component';
 
 
 
@@ -44,6 +46,7 @@ import { MathliveBlot } from './math-live-blot'
     LegendComponent,
     VerticalTrailComponent,
     HorizontalTrailComponent,
+    EditOptionsComponent,
     
   ],
   imports: [
@@ -62,7 +65,7 @@ import { MathliveBlot } from './math-live-blot'
     ReactiveFormsModule,
     MatToolbarModule
   ],
-  providers: [MathliveBlot],
+  providers: [MathliveBlot, PathLinkBlot],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

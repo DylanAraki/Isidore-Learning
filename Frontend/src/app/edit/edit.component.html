@@ -16,63 +16,7 @@
     <div class="top">
         <textarea id="map-title" type="text" [(ngModel)]="title" (ngModelChange)="titleChange($event)" name="title"maxlength="50" wrap="hard" cols="25" rows="2"></textarea>
         <app-horizontal-trail id="horizontal-trail" [curState]="state[state.length-1]"></app-horizontal-trail>
-        <div id="edit-options">
-            <div id="actions">
-                <fa-icon [icon]="faImage" [class]="selectedIcon === ICON_SELECTED.IMAGE ? 'selected-icon' : ''"
-                    (click)="selectedIcon === ICON_SELECTED.IMAGE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.IMAGE"></fa-icon>
-                <fa-icon [icon]="faShapes" class="icon" [class]="selectedIcon === ICON_SELECTED.SHAPES? 'selected-icon' : ''"
-                    (click)="selectedIcon === ICON_SELECTED.SHAPES ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.SHAPES"></fa-icon>
-                <fa-icon [icon]="faFont" class="icon" [class]="selectedIcon === ICON_SELECTED.TEXT ? 'selected-icon' : ''"
-                    (click)="selectedIcon === ICON_SELECTED.TEXT ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.TEXT"></fa-icon>
-                <fa-icon [icon]="faEye" class="icon" [class]="selectedIcon === ICON_SELECTED.APPEARANCE ? 'selected-icon' : ''"
-                    (click)="selectedIcon === ICON_SELECTED.APPEARANCE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.APPEARANCE"></fa-icon>
-                <fa-icon [icon]="faTrash" class="icon" [class]="selectedIcon === ICON_SELECTED.DELETE ? 'selected-icon' : ''"
-                    (click)="selectedIcon === ICON_SELECTED.DELETE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.DELETE"></fa-icon>
-                <button>Publish</button>
-            </div>
-            <div>
-                <input *ngIf="selectedIcon === ICON_SELECTED.IMAGE" type="file"
-                    (change)="view.addImage($event); selectedIcon = ICON_SELECTED.NONE;">
-                <div *ngIf="selectedIcon === ICON_SELECTED.SHAPES">
-                    <svg></svg>
-                    <svg></svg>
-                    <svg></svg>
-                    <svg></svg>
-                    <svg></svg>
-                    <!--Stroke width-->
-                    <!--Stroke color-->
-                    <!--Fill color-->
-
-
-                    <!--Show more options-->
-                </div>
-                <div *ngIf="selectedIcon === ICON_SELECTED.TEXT">
-                    <!--Bold-->
-                    <!--Italics-->
-                    <!--Underline-->
-                    <!--Strikethrough-->
-
-                    <!--Script-->
-
-                    <!--Ordered list-->
-                    <!--Unordered list-->
-                    <!--Justify content direction-->
-
-                    <!--Font style-->
-                    <!--Font size-->
-                    <!--Text color-->
-                    <!--Background color-->
-
-                    <!--Code-->
-                    <!--Math-->
-
-                    <!--Link-->
-
-
-                    <!--Show more options-->
-                </div>
-            </div>
-        </div>
+        <app-edit-options id="edit-options"></app-edit-options>            
     </div>
     <div class="bot">
         <nav *ngIf="state.length > 1" class="vertical-nav">

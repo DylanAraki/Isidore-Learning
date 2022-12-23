@@ -1,0 +1,73 @@
+<div id="actions">
+    <fa-icon [icon]="faImage" [class]="selectedIcon === ICON_SELECTED.IMAGE ? 'selected-icon' : ''"
+        (click)="selectedIcon === ICON_SELECTED.IMAGE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.IMAGE"></fa-icon>
+    <fa-icon [icon]="faShapes" class="icon" [class]="selectedIcon === ICON_SELECTED.SHAPE? 'selected-icon' : ''"
+        (click)="selectedIcon === ICON_SELECTED.SHAPE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.SHAPE"></fa-icon>
+    <fa-icon [icon]="faFont" class="icon" [class]="selectedIcon === ICON_SELECTED.TEXT ? 'selected-icon' : ''"
+        (click)="selectedIcon === ICON_SELECTED.TEXT ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.TEXT"></fa-icon>
+    <fa-icon [icon]="faSquareRootAlt" class="icon" [class]="selectedIcon === ICON_SELECTED.MATH ? 'selected-icon' : ''"
+        (click)="selectedIcon === ICON_SELECTED.MATH ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.MATH"></fa-icon>
+    <fa-icon [icon]="faCompass" class="icon" [class]="selectedIcon === ICON_SELECTED.LEGEND ? 'selected-icon' : ''"
+        (click)="selectedIcon === ICON_SELECTED.LEGEND ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.LEGEND"></fa-icon>
+    <fa-icon [icon]="faEye" class="icon" [class]="selectedIcon === ICON_SELECTED.APPEARANCE ? 'selected-icon' : ''"
+        (click)="selectedIcon === ICON_SELECTED.APPEARANCE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.APPEARANCE"></fa-icon>
+    <fa-icon [icon]="faTrash" class="icon" [class]="selectedIcon === ICON_SELECTED.DELETE ? 'selected-icon' : ''"
+        (click)="selectedIcon === ICON_SELECTED.DELETE ? selectedIcon = ICON_SELECTED.NONE : selectedIcon = ICON_SELECTED.DELETE"></fa-icon>
+    <button>Publish</button>
+</div>
+<div [ngSwitch]="selectedIcon">
+    <input *ngSwitchCase="ICON_SELECTED.IMAGE" ngBreak type="file"
+        (change)="view.addImage($event); selectedIcon = ICON_SELECTED.NONE;">
+    <div *ngSwitchCase="ICON_SELECTED.SHAPE" ngBreak>
+        <!--Square: Call a function on View-->
+        <!--Circle: Call a function on View-->
+        <!--Triangle: Call a function on View-->
+        <!--Line: Edit ViewState-->
+        <!--Arc: Edit ViewState-->
+        <!--Stroke width: Change variable on Edit-->
+        <!--Stroke color: Change variable on Edit-->
+        <!--Fill color: Change variable on Edit-->
+
+
+        <!--Show more options-->
+    </div>
+    <div *ngSwitchCase="ICON_SELECTED.TEXT" ngBreak> <!--On click add textbox to current location-->
+        <!--Bold-->
+        <!--Italics-->
+        <!--Underline-->
+        <!--Strikethrough-->
+
+        <!--Script-->
+
+        <!--Ordered list-->
+        <!--Unordered list-->
+        <!--Justify content direction-->
+
+        <!--Font style-->
+        <!--Font size-->
+        <!--Text color-->
+        <!--Background color-->
+
+        <!--Code-->
+        <!--Block quote-->
+
+        <!--Link (Create a modal and then create instance of Path-Link-Blot). In slideview, put a rectangle over it that prevents anything from being clicked-->
+        <!--Show more options-->
+    </div>
+    <div *ngSwitchCase="ICON_SELECTED.MATH" ngBreak> <!--On click add mathbox to currrent location-->
+        <!--Font size-->
+        <!--Text color?-->
+        <!--Background color?-->
+        <!--Keyboard option (iframe panel)-->
+    </div>
+    <div *ngSwitchCase="ICON_SELECTED.LEGEND" ngBreak>
+        <!--TODO:-->
+    </div>
+    <div *ngSwitchCase="ICON_SELECTED.APPEARANCE" ngBreak>
+        <!--Animated state 1-5 highlight current     Manipulate animation variable AND manipulate the ViewState. Will need conditional statement on everything-->
+        <!--Add button (on right if <5)-->
+    </div>
+    <div *ngSwitchCase="ICON_SELECTED.DELETE" ngBreak> <!--Change ViewState-->
+    </div>
+    <div></div>
+</div>

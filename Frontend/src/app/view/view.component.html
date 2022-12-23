@@ -37,7 +37,7 @@
     <foreignObject *ngFor="let textBox of currentLandmark.textContent | keyvalue" class="svg-landmark-text-wrapper" [id]="editMode ? textBox.key : ''" 
     [attr.x]="textBox.value.x" [attr.y]="textBox.value.y" [attr.height]="textBox.value.height" [attr.width]="textBox.value.width">
         <div class="landmark-text-wrapper">
-            <quill-editor class="text-content" [modules]="{ toolbar: [['bold', 'italic', 'formula']] }" (onEditorCreated)="onEditorCreated($event)">
+            <quill-editor class="text-content" [modules]="{ toolbar: {container: [['bold', 'italic', 'formula', 'link']]} }" (onEditorCreated)="onEditorCreated($event)">
             </quill-editor>
         </div>
     </foreignObject>
