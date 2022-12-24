@@ -1,3 +1,6 @@
+import { COGNITO_USER_POOL_ID, COGNITO_WEB_CLIENT_ID } from './hidden'
+
+
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
@@ -5,8 +8,8 @@
 export const environment = {
   production: false,
   cognito: {
-    userPoolId: 'us-east-1_ak9h975Yp',
-    userPoolWebClientId: '73juqojl8nec79ouappjvc7i0k'
+    userPoolId: COGNITO_USER_POOL_ID,
+    userPoolWebClientId: COGNITO_WEB_CLIENT_ID
   }
 };
 

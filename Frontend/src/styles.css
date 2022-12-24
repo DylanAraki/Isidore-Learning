@@ -28,3 +28,18 @@ math-field {
 :root {
     --keyboard-zindex: 1005; 
 }
+
+
+
+
+/* app-sign-up {
+    flex-grow: 1;
+} */
+
+
+/*
+A bit of a hack, but this will ensure that the full viewport is always filled. Each component will appear in the middle
+*/
+/* router-outlet + * {
+    flex-grow: 1;
+} */

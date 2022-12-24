@@ -19,7 +19,7 @@ export class SignInComponent implements OnInit {
   }
 
   protected signIn() {
-    this.authenticator.signInWithUsername(this.userInput.username, this.userInput.password);
+    //this.authenticator.signInWithUsername(this.userInput.username, this.userInput.password);
   }
 
 }

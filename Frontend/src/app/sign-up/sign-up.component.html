@@ -1,0 +1,87 @@
+<form [formGroup]="signUpForm" (ngSubmit)="onSubmit()" id="sign-up-form">
+    <mat-form-field>
+        <input matInput type="text" formControlName="username" placeholder="Username" autocomplete="off">
+        <mat-error *ngIf="username.invalid && (username.dirty || username.touched)">
+            <span *ngIf="username.errors!['required']">Username is required<br></span>
+            <span *ngIf="username.errors!['minlength']">Username must be at least 6 characters<br></span>
+            <span *ngIf="username.errors!['maxlength']">Username must be no more than 20 characters<br></span>
+            <span *ngIf="username.errors!['pattern']">Username can only contain letters, numbers, and some special
+                characters<br></span>
+            <span *ngIf="username.errors!['usernameTaken']">Username is already taken<br></span>
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput type="email" formControlName="email" placeholder="Email" autocomplete="off">
+        <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
+            <span *ngIf="email.errors!['required']">Email is required<br></span>
+            <span *ngIf="email.errors!['email']">Email is invalid<br></span>
+            <span *ngIf="email.errors!['emailTaken']">Email is already registered<br></span>
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field>
+        <input matInput type="password" formControlName="password" placeholder="Password"
+            [type]="showPassword ? 'text' : 'password'">
+    </mat-form-field>
+
+    <div>
+        <mat-checkbox [(ngModel)]="showPassword" [ngModelOptions]="{standalone: true}">Show password</mat-checkbox>
+        <ul id="password-requirements">
+            <li>
+                <mat-icon *ngIf="password.value.length >= 8" class="check">check</mat-icon>
+                <mat-icon *ngIf="password.value.length < 8" class="close">close</mat-icon>
+                At least 8 characters
+            </li>
+            <li>
+                <mat-icon *ngIf="password.value.match('/\d/')" class="check">check</mat-icon>
+                <mat-icon *ngIf="!password.value.match('/\d/')" class="close">close</mat-icon>
+                At least one number
+            </li>
+            <li>
+                <mat-icon *ngIf="password.value.match('/[^A-Za-z0-9]/')" class="check">check</mat-icon>
+                <mat-icon *ngIf="!password.value.match('/[^A-Za-z0-9]/')" class="close">close</mat-icon>
+                At least one special character
+            </li>
+            <li>
+                <mat-icon class="check" *ngIf="password.value.match('/[A-Z]/')" class="check">check</mat-icon>
+                <mat-icon *ngIf="!password.value.match('/[A-Z]/')" class="close">close</mat-icon>
+                At least one uppercase letter
+            </li>
+            <li>
+                <mat-icon class="check" *ngIf="password.value.match('/[a-z]/')" class="check">check</mat-icon>
+                <mat-icon *ngIf="!password.value.match('/[a-z]/')" class="close">close</mat-icon>
+                At least one lowercase letter
+            </li>
+
+        </ul>
+    </div>
+
+    <mat-form-field>
+        <input matInput type="password" formControlName="confirmPassword" placeholder="Confirm Password">
+        <mat-error *ngIf="confirmPassword.invalid && (confirmPassword.dirty || confirmPassword.touched)">
+            <span *ngIf="confirmPassword.errors!['required']">Confirm Password is required</span>
+            <span *ngIf="confirmPassword.errors!['passwordsDoNotMatch']">Passwords must match</span>
+        </mat-error>
+    </mat-form-field>
+
+    
+
+    <!-- Verification code field is only shown if all other fields are valid -->
+    <mat-form-field *ngIf="signUpForm.valid">
+        <input matInput type="text" formControlName="verificationCode" placeholder="Verification Code"
+            autocomplete="off">
+        <mat-error *ngIf="verificationCode.invalid && (verificationCode.dirty || verificationCode.touched)">
+            <span *ngIf="verificationCode.errors!['required']">Verification Code is required</span>
+            <span *ngIf="verificationCode.errors!['invalidVerificationCode']">Verification Code is invalid</span>
+        </mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button type="submit" [disabled]="signUpForm.invalid">Sign Up</button>
+
+
+    <!-- Display error message if there is an error -->
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+    <p>Already registered? <a routerLink="/sign-in">Sign in</a></p>
+</form>

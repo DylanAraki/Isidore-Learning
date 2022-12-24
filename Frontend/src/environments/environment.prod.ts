@@ -1,7 +1,8 @@
+import { COGNITO_USER_POOL_ID, COGNITO_WEB_CLIENT_ID } from './hidden'
 export const environment = {
   production: true,
   cognito: {
-    userPoolId: 'us-east-1_dsVN8egpx',
-    userPoolWebClientId: 'sde9pia256ha0dlgkgcrr8k53'
+    userPoolId: COGNITO_USER_POOL_ID,
+    userPoolWebClientId: COGNITO_WEB_CLIENT_ID
   }
 };

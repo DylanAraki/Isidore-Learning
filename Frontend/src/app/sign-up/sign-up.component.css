@@ -1,0 +1,16 @@
+/* Add a red color to the error message */
+.error-message {
+    color: red;
+}
+.check {
+    color: green;
+}
+.close {
+    color: red;
+}
+#sign-up-form {
+    display: grid;
+}
+#password-requirements {
+    list-style: none;
+}

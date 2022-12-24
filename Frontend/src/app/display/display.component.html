@@ -1,0 +1,40 @@
+<svg>
+    <!--Image-->
+    <g *ngFor="let imageBox of currentLandmark.imageContent | keyvalue">
+        <!--Set all the relevant values. The fobj may be replaced with a copy paste of the SVG elements-->
+        <image [id]="showId ? imageBox.key : ''" >
+
+        </image>
+        <foreignObject *ngIf="">
+
+        </foreignObject>
+        <foreignObject *ngIf="">
+
+        </foreignObject>
+    </g>
+
+    <!--Shape-->
+    <g>
+        <path></path>
+    </g>
+
+    <!--Draw Line-->
+    <g>
+
+    </g>
+
+    <!--Draw Arc-->
+    <g>
+
+    </g>
+
+    <!--Text-->
+    <g>
+        <foreignObject></foreignObject>
+    </g>
+
+    <!--Math-->
+    <g>
+        <foreignObject></foreignObject>
+    </g>
+</svg>

@@ -9,7 +9,7 @@ export enum ICON_SELECTED {
     LEGEND = 7,
 }
 export enum DISPLAY_MODE {
-    DISPLAY = 0, //Display with no user interaction at all
+    SHOW = 0, //Display with no user interaction at all
     EDIT = 1, //When a user is editing the state
     VIEW = 2, //When a user is viewing a presentation
     /*Add line*/

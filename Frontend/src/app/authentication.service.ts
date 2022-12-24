@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { Amplify, Auth } from 'aws-amplify';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -8,7 +10,12 @@ import { environment } from 'src/environments/environment';
 export class AuthenticationService {
   private currentUser: any;
 
-  constructor() { 
+
+  checkUsernameTaken(username: string): boolean { return true; }
+  checkEmailTaken(email: string): boolean { return true; }  
+  checkVerificationCode(code: number): boolean { return true; }
+  signUp(signUpForm: FormGroup): Observable<string> { return new Observable() }
+  /* constructor() { 
     Amplify.configure({
       Auth: environment.cognito
     });
@@ -16,6 +23,9 @@ export class AuthenticationService {
     Auth.currentUserInfo()
     .then((user) => {
       this.currentUser = user; //can be null
+    })
+    .catch(() => {
+      this.currentUser = null;
     })
   }
 
@@ -63,7 +73,7 @@ export class AuthenticationService {
   }
   public updatePassword(uuid: string, verificationCode: string, newPassword: string): Promise<any> {
     return Auth.forgotPasswordSubmit(uuid, verificationCode, newPassword)
-  }
+  } */
 
   
 

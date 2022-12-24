@@ -9,7 +9,7 @@ import { ContentService } from './content.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  currentUser: any; //TODO: Assign the type better
+  currentUser: any = null; //TODO: Assign the type better
 
   constructor(private authenticator: AuthenticationService, private contentManager: ContentService, private router: Router) {
     //Determine which user (if any) is currently logged in
@@ -21,7 +21,7 @@ export class AppComponent {
   }
 
 
-  protected createMap() {
+/*   protected createMap() {
     //if (this.currentUser !== null) {
     if(this.authenticator.getCurrentUser != null) {
       this.authenticator.getCurrentUserSession()
@@ -49,7 +49,7 @@ export class AppComponent {
               this.router.navigate(['edit/' + data["id"]]);
             })
         })
-    }
+    } */
 
     /*
     //Send a create request to the server
@@ -78,8 +78,8 @@ export class AppComponent {
   }
   */
     //If the user is not signed in, redirect him (only users can create content)
-    else {
+    /* else {
       this.router.navigate(['sign-in']);
     }
-  }
+  } */
 }

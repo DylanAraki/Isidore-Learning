@@ -1,13 +1,25 @@
-<header>
+<div class="page-wrapper">
+  <header> 
+    <!--Content--> 
+  </header>
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+  <footer> 
+    <!--Content--> 
+  </footer>
+</div>
+
+<!-- <header>
   <nav id="site-nav">
     <h1><a [routerLink]="''">Isidore Learning</a></h1>
-    <button (click)="createMap()">Create Learning Map</button>
-    <button [routerLink]="'sign-in'" *ngIf="currentUser===null">Sign in</button>
-    <button [routerLink]="'register'" *ngIf="currentUser===null">Register</button>
+    <button (click)="createMap()">Create Learning Map</button>    
+<button [routerLink]="'sign-in'" *ngIf="currentUser===null">Sign in</button>
+    <button [routerLink]="'sign-up'" *ngIf="currentUser===null">Sign up</button>
     <button *ngIf="currentUser!==null">Sign out</button>
   </nav>
 </header>
-<router-outlet></router-outlet>
+<router-outlet></router-outlet> -->
 
 
 <!--
